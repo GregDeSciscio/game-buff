@@ -8,6 +8,7 @@ import Dashboard from './components/Dashboard';
 import CreateLoadout from './components/CreateLoadout';
 import GameBuffSession from './components/GameBuffSession';
 import History from './components/History';
+import Game from './components/Game';
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
@@ -66,6 +67,12 @@ const App = () => {
         <Route path="/create" element={
           <ProtectedRoute>
             <CreateLoadout />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/game/:id" element={
+          <ProtectedRoute>
+            <Game />
           </ProtectedRoute>
         } />
 

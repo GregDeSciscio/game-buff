@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import { Plus, Play, Trophy, LogOut, History, Pencil } from 'lucide-react'; // Added Pencil
+import { Plus, Play, Trophy, LogOut, History, Pencil, Eye } from 'lucide-react'; // Added Pencil
 import { getLevelProgress } from '../utilities/gameLogic';
 
 const Dashboard = () => {
@@ -109,10 +109,20 @@ const Dashboard = () => {
                 <Pencil size={20} />
               </button>
 
+              {/* VIEW BUTTON */}
+              <button 
+                onClick={() => navigate(`/game/${loadout.id}`, { state: { loadout } })} 
+                className="p-3 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-full transition-colors"
+                title="View Game Details"
+              >
+                <Eye size={20} />
+              </button>
+
               {/* PLAY BUTTON */}
               <button 
                 onClick={() => navigate('/session', { state: { loadout } })} 
                 className="bg-green-600 hover:bg-green-500 text-white p-3 rounded-full shadow-lg shadow-green-900/20"
+                title="Start Session"
               >
                 <Play size={20} fill="currentColor" />
               </button>
@@ -126,7 +136,7 @@ const Dashboard = () => {
           className="border-2 border-dashed border-slate-700 text-slate-400 p-6 rounded-xl flex flex-col items-center justify-center hover:bg-slate-800 hover:text-white transition-all min-h-[100px]"
         >
           <Plus size={32} className="mb-2" />
-          <span className="font-bold">Add New Game Loadout</span>
+          <span className="font-bold">Add New Game</span>
         </button>
       </div>
 

@@ -7,6 +7,7 @@ const History = () => {
   const navigate = useNavigate();
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
     fetchHistory();
@@ -30,6 +31,46 @@ const History = () => {
     else setSessions(data || []);
     
     setLoading(false);
+  };
+
+  const handleDelete = async (session) => {
+    const confirmed = window.confirm('Delete this session? This will remove the XP gained from your profile. This cannot be undone.');
+    if (!confirmed) return;
+
+    setDeletingId(session.id);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { error: deleteError } = await supabase
+        .from('sessions')
+        .delete()
+        .eq('id', session.id);
+      if (deleteError) throw deleteError;
+
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('total_xp')
+        .eq('id', user.id)
+        .single();
+      if (profileError) throw profileError;
+
+      const currentXp = profileData?.total_xp || 0;
+      const newXp = Math.max(0, currentXp - (session.total_xp_gained || 0));
+
+      const { error: xpError } = await supabase
+        .from('profiles')
+        .update({ total_xp: newXp })
+        .eq('id', user.id);
+      if (xpError) throw xpError;
+
+      setSessions((prev) => prev.filter((s) => s.id !== session.id));
+    } catch (error) {
+      console.error('Failed to delete session', error);
+      alert('Failed to delete session. It may still exist and XP was not adjusted.');
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   // Helper to format date nicely
@@ -60,11 +101,11 @@ const History = () => {
       ) : (
         <div className="space-y-4">
           {sessions.map((session) => (
-            <div key={session.id} className="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-sm">
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <h3 className="font-bold text-white text-lg">
-                    {session.loadouts?.game_title || 'Unknown Game'}
+              <div key={session.id} className="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-sm">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <h3 className="font-bold text-white text-lg">
+                      {session.loadouts?.game_title || 'Unknown Game'}
                   </h3>
                   <div className="flex items-center gap-1 text-xs text-slate-400 mt-1">
                     <Calendar size={12} /> {formatDate(session.played_at)}
@@ -73,19 +114,26 @@ const History = () => {
                 <div className="text-right">
                   <span className="block text-green-400 font-bold text-lg">+{session.total_xp_gained} XP</span>
                 </div>
-              </div>
-              
-              {/* Stats Row */}
-              <div className="flex gap-4 mt-3 pt-3 border-t border-slate-700/50">
-                <div className="flex items-center gap-1 text-xs text-slate-300">
+                </div>
+                
+                {/* Stats Row */}
+              <div className="flex gap-4 mt-3 pt-3 border-t border-slate-700/50 items-center justify-between">
+                <div className="flex items-center gap-2 text-xs text-slate-300">
                   <Clock size={14} className="text-blue-400" /> 
                   {Math.floor(session.duration_seconds / 60)}m {session.duration_seconds % 60}s
                 </div>
-                {/* Detailed Logs Accordion could go here in v2 */}
+                <button
+                  onClick={() => handleDelete(session)}
+                  disabled={deletingId === session.id}
+                  className="text-xs px-3 py-2 rounded-lg border border-red-500 text-red-300 hover:bg-red-500 hover:text-white transition disabled:opacity-50"
+                  title="This will delete the session and remove the XP gained"
+                >
+                  {deletingId === session.id ? 'Deleting...' : 'Delete Session'}
+                </button>
               </div>
-            </div>
-          ))}
-        </div>
+              </div>
+            ))}
+          </div>
       )}
     </div>
   );

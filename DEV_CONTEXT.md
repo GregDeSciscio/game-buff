@@ -2,7 +2,7 @@
 
 ## 0. Development Protocols (Read First)
 1.  **Context Awareness:** Always read this file before generating code to ensure consistency with the stack and database schema.
-2.  **Changelog Updates:** **CRITICAL:** Upon completing any major feature or bug fix, you MUST append a line to the **Changelog** section below summarizing the change.
+2.  **Changelog Updates:** **CRITICAL:** Upon completing any major feature or bug fix, you MUST append a line to the **Changelog** section below summarizing the change. Include a timestamp and update the **Immediate Roadmap** section if needed.
 3.  **Schema Accuracy:** If you alter the database (SQL), update the **Database Schema** section to reflect the new structure immediately.
 
 ## 1. Project Brief
@@ -38,6 +38,11 @@
 - **sessions:** `id`, `user_id`, `loadout_id`, `total_xp_gained`, `duration_seconds`, `log_summary` (JSONB)
 
 ## 5. Changelog
+- **[Latest] Dashboard Controls:** Play button now goes straight to session; added view icon to open game details.
+- **Game-level Session Purge:** `/game/:id` now supports deleting all sessions for a game with XP rollback and warning.
+- **Session Deletion Fix:** Frontend now subtracts XP only after a successful delete; added sessions delete RLS policy to schema.
+- **[Latest] Enhanced Game Page Detail:** Added per-exercise breakdown and timeframe filter to recent sessions on `/game/:id`.
+- **Added Game Page & Activity Stats:** New `/game/:id` route shows per-game rep totals (today/yesterday/7/30) and recent sessions before starting a session.
 - **[Latest] Added Sound FX:** Web Audio click cues on buttons and timer completion chime in GameBuffSession.
 - **[Latest] Added PWA Manifest:** Added `manifest.webmanifest`, install icons, and head tags for Add to Home Screen compatibility.
 - **[Latest] Fixed RLS Update Policy:** Added policy to allow `UPDATE` on loadouts table so edits persist.
@@ -48,5 +53,3 @@
 
 ## 6. Immediate Roadmap (Next Steps)
 1.  **Biometrics:** Add Height/Weight to profile for Calorie estimation.
-2.  **Sound Effects:** Add audio feedback for button presses and timer completion.
-3.  **PWA Manifest:** Configure `manifest.json` for "Add to Home Screen" capability.

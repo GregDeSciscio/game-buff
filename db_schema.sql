@@ -43,6 +43,7 @@ create policy "Users can update own loadouts" on loadouts for update using (auth
 -- Sessions
 create policy "Users can see own sessions" on sessions for select using (auth.uid() = user_id);
 create policy "Users can create sessions" on sessions for insert with check (auth.uid() = user_id);
+create policy "Users can delete own sessions" on sessions for delete using (auth.uid() = user_id);
 -- [FIX FOR HISTORY JOIN]
 alter table sessions drop constraint if exists sessions_loadout_id_fkey, add constraint sessions_loadout_id_fkey foreign key (loadout_id) references loadouts(id) on delete set null;
 

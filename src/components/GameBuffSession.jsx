@@ -109,7 +109,15 @@ const GameBuffSession = ({ initialLoadout }) => {
     const gainedXP = calculateXP(trigger.exercise, trigger.amount, trigger.type);
     setSessionXP(prev => prev + gainedXP);
     setTotalReps(prev => prev + trigger.amount);
-    setLog([{ time: formatTime(seconds), message: `+${gainedXP} XP (${trigger.exercise})`, xp: gainedXP }, ...log]);
+    const entry = {
+      time: formatTime(seconds),
+      message: `+${gainedXP} XP (${trigger.exercise})`,
+      xp: gainedXP,
+      amount: trigger.amount,
+      type: trigger.type,
+      exercise: trigger.exercise
+    };
+    setLog([entry, ...log]);
     setActiveTimerTrigger(null);
   };
 
