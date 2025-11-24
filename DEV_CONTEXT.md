@@ -38,6 +38,8 @@
 - **sessions:** `id`, `user_id`, `loadout_id`, `total_xp_gained`, `duration_seconds`, `log_summary` (JSONB)
 
 ## 5. Changelog
+- **[Latest] Added Sound FX:** Web Audio click cues on buttons and timer completion chime in GameBuffSession.
+- **[Latest] Added PWA Manifest:** Added `manifest.webmanifest`, install icons, and head tags for Add to Home Screen compatibility.
 - **[Latest] Fixed RLS Update Policy:** Added policy to allow `UPDATE` on loadouts table so edits persist.
 - **Added Edit Functionality:** Refactored `CreateLoadout` to handle `id` param for editing.
 - **Added History:** Created `History.jsx` and updated Dashboard to link to it.

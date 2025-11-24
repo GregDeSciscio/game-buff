@@ -3,6 +3,7 @@ import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import { Play, Pause, X, RotateCcw } from 'lucide-react';
 import { calculateXP, getLevelProgress } from '../utilities/gameLogic';
+import { playClick, playTimerComplete } from '../utilities/sounds';
 
 const TimerModal = ({ trigger, onComplete, onCancel }) => {
   const [timeLeft, setTimeLeft] = useState(trigger.amount);
@@ -11,6 +12,7 @@ const TimerModal = ({ trigger, onComplete, onCancel }) => {
   useEffect(() => {
     if (isPaused) return;
     if (timeLeft === 0) {
+      playTimerComplete();
       onComplete(trigger);
       return;
     }
@@ -28,9 +30,9 @@ const TimerModal = ({ trigger, onComplete, onCancel }) => {
         <span className="text-8xl font-mono font-black text-white relative z-10">{timeLeft}</span>
       </div>
       <div className="flex gap-6">
-        <button onClick={onCancel} className="p-4 rounded-full bg-slate-700 text-slate-300 hover:bg-red-900"><X size={32} /></button>
-        <button onClick={() => setIsPaused(!isPaused)} className="p-4 rounded-full bg-blue-600 text-white">{isPaused ? <Play size={32} /> : <Pause size={32} />}</button>
-        <button onClick={() => setTimeLeft(trigger.amount)} className="p-4 rounded-full bg-slate-700 text-slate-300"><RotateCcw size={32} /></button>
+        <button onClick={() => { playClick(); onCancel(); }} className="p-4 rounded-full bg-slate-700 text-slate-300 hover:bg-red-900"><X size={32} /></button>
+        <button onClick={() => { playClick(); setIsPaused(!isPaused); }} className="p-4 rounded-full bg-blue-600 text-white">{isPaused ? <Play size={32} /> : <Pause size={32} />}</button>
+        <button onClick={() => { playClick(); setTimeLeft(trigger.amount); }} className="p-4 rounded-full bg-slate-700 text-slate-300"><RotateCcw size={32} /></button>
       </div>
     </div>
   );
@@ -94,6 +96,7 @@ const GameBuffSession = ({ initialLoadout }) => {
   };
 
   const handleTrigger = (trigger) => {
+    playClick();
     if (!isActive) setIsActive(true);
     if (trigger.type === 'timer') {
       setActiveTimerTrigger(trigger);
@@ -111,6 +114,7 @@ const GameBuffSession = ({ initialLoadout }) => {
   };
 
   const handleEndSession = async () => {
+    playClick();
     setIsSaving(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -161,7 +165,7 @@ const GameBuffSession = ({ initialLoadout }) => {
         </div>
         <div className="flex justify-between items-center mb-4">
            <div className="flex flex-col"><span className="text-xs text-slate-400 uppercase">Total Reps</span><span className="text-3xl font-bold text-blue-400">{totalReps}</span></div>
-           <button onClick={() => setIsActive(!isActive)} className={`p-4 rounded-full ${isActive ? 'bg-yellow-600' : 'bg-green-600'}`}>{isActive ? <Pause size={24} /> : <Play size={24} />}</button>
+           <button onClick={() => { playClick(); setIsActive(!isActive); }} className={`p-4 rounded-full ${isActive ? 'bg-yellow-600' : 'bg-green-600'}`}>{isActive ? <Pause size={24} /> : <Play size={24} />}</button>
         </div>
         <button onClick={handleEndSession} disabled={isSaving} className="w-full py-3 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-300 text-sm font-semibold disabled:opacity-50">{isSaving ? "Saving..." : "End Session & Save"}</button>
       </div>
