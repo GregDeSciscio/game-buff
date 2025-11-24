@@ -3,7 +3,9 @@ create table profiles (
   id uuid references auth.users not null primary key,
   username text,
   total_xp bigint default 0,
-  current_level int default 1
+  current_level int default 1,
+  height_cm numeric,
+  weight_kg numeric
 );
 
 create table loadouts (

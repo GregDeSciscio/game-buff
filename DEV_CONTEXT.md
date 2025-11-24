@@ -28,7 +28,7 @@
 - **Dashboard:** Displays User Level, XP Progress, and Loadouts.
 - **Create Loadout:** Working (Supports Reps & Timer logic).
 - **Edit Loadout:** Working (Updates existing records).
-- **Active Session:** Working (Live timer, large buttons, audio cues pending).
+- **Active Session:** Working (Live timer, large buttons).
 - **History:** Working (View past sessions + XP gained).
 - **Database:** RLS policies set for Select, Insert, and Update.
 
@@ -38,7 +38,8 @@
 - **sessions:** `id`, `user_id`, `loadout_id`, `total_xp_gained`, `duration_seconds`, `log_summary` (JSONB)
 
 ## 5. Changelog
-- **[Latest] Post-session Redirect:** Ending a session now returns to the game detail page instead of dashboard.
+- **[Latest] Profile Height/Weight:** Added profile screen and fields to store height_cm and weight_kg.
+- **Post-session Redirect:** Ending a session now returns to the game detail page instead of dashboard.
 - **Detailed Activity:** Game page now shows top exercises (today & last 7 days) alongside rep totals.
 - **[Latest] Streamlined Session UI:** Auto-start sessions on first tap; hide play/pause and timer modal for rep-only loadouts.
 - **[Latest] Dashboard Controls:** Play button now goes straight to session; added view icon to open game details.
