@@ -148,7 +148,9 @@ const GameBuffSession = ({ initialLoadout }) => {
 
   return (
     <div className="flex flex-col h-screen bg-slate-900 text-slate-100 font-sans">
-      {activeTimerTrigger && <TimerModal trigger={activeTimerTrigger} onComplete={logSuccess} onCancel={() => setActiveTimerTrigger(null)} />}
+      {hasTimerTriggers && activeTimerTrigger && (
+        <TimerModal trigger={activeTimerTrigger} onComplete={logSuccess} onCancel={() => setActiveTimerTrigger(null)} />
+      )}
       
       <div className="flex justify-between items-center p-4 bg-slate-800 border-b border-slate-700 shadow-md">
         <div><h2 className="text-xs text-slate-400 uppercase tracking-widest">Current Game</h2><h1 className="text-xl font-bold text-white">{loadout.game_title}</h1></div>
