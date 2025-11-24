@@ -89,7 +89,26 @@ const Game = () => {
       yesterday: sumRange(yesterdayStart, todayStart),
       last7: sumRange(last7Start, null),
       last30: sumRange(last30Start, null),
+      topToday: aggregateExercisesForRange(sessionList, todayStart, null),
+      top7: aggregateExercisesForRange(sessionList, last7Start, null),
     });
+  };
+
+  const aggregateExercisesForRange = (sessionList, start, end) => {
+    const totals = {};
+    sessionList.forEach((session) => {
+      const played = new Date(session.played_at);
+      if (start && played < start) return;
+      if (end && played >= end) return;
+      const entries = parseLog(session.log_summary);
+      entries.forEach((entry) => {
+        if (entry?.type !== 'reps') return;
+        const exercise = entry.exercise || entry.message?.match(/\(([^)]+)\)/)?.[1] || 'Exercise';
+        const amount = typeof entry.amount === 'number' ? entry.amount : 0;
+        totals[exercise] = (totals[exercise] || 0) + amount;
+      });
+    });
+    return Object.entries(totals).sort((a, b) => b[1] - a[1]).slice(0, 4);
   };
 
   const handleDelete = async (session) => {
@@ -310,6 +329,36 @@ const Game = () => {
                   </tr>
                 </tbody>
               </table>
+            </div>
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="bg-slate-900/60 border border-slate-800 rounded-lg p-3">
+                <p className="text-xs uppercase text-slate-400 mb-2">Top Exercises Today</p>
+                {stats.topToday?.length ? (
+                  <div className="flex flex-wrap gap-2">
+                    {stats.topToday.map(([exercise, reps]) => (
+                      <span key={exercise} className="text-[11px] text-slate-100 bg-slate-800 px-2 py-1 rounded-full border border-slate-700">
+                        {exercise}: {reps} reps
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-500">No reps logged today.</p>
+                )}
+              </div>
+              <div className="bg-slate-900/60 border border-slate-800 rounded-lg p-3">
+                <p className="text-xs uppercase text-slate-400 mb-2">Top Exercises (Last 7 Days)</p>
+                {stats.top7?.length ? (
+                  <div className="flex flex-wrap gap-2">
+                    {stats.top7.map(([exercise, reps]) => (
+                      <span key={exercise} className="text-[11px] text-slate-100 bg-slate-800 px-2 py-1 rounded-full border border-slate-700">
+                        {exercise}: {reps} reps
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-500">No reps logged last 7 days.</p>
+                )}
+              </div>
             </div>
           </div>
 

@@ -38,6 +38,7 @@
 - **sessions:** `id`, `user_id`, `loadout_id`, `total_xp_gained`, `duration_seconds`, `log_summary` (JSONB)
 
 ## 5. Changelog
+- **[Latest] Detailed Activity:** Game page now shows top exercises (today & last 7 days) alongside rep totals.
 - **[Latest] Streamlined Session UI:** Auto-start sessions on first tap; hide play/pause and timer modal for rep-only loadouts.
 - **[Latest] Dashboard Controls:** Play button now goes straight to session; added view icon to open game details.
 - **Game-level Session Purge:** `/game/:id` now supports deleting all sessions for a game with XP rollback and warning.
