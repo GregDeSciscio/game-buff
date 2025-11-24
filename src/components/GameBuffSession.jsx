@@ -51,6 +51,7 @@ const GameBuffSession = ({ initialLoadout }) => {
   const [log, setLog] = useState([]);
   const [activeTimerTrigger, setActiveTimerTrigger] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const hasTimerTriggers = loadout?.triggers?.some((t) => t.type === 'timer');
 
   // 1. NEW: Fetch the latest version of this loadout immediately
   useEffect(() => {
@@ -173,7 +174,9 @@ const GameBuffSession = ({ initialLoadout }) => {
         </div>
         <div className="flex justify-between items-center mb-4">
            <div className="flex flex-col"><span className="text-xs text-slate-400 uppercase">Total Reps</span><span className="text-3xl font-bold text-blue-400">{totalReps}</span></div>
-           <button onClick={() => { playClick(); setIsActive(!isActive); }} className={`p-4 rounded-full ${isActive ? 'bg-yellow-600' : 'bg-green-600'}`}>{isActive ? <Pause size={24} /> : <Play size={24} />}</button>
+           {hasTimerTriggers && (
+             <button onClick={() => { playClick(); setIsActive(!isActive); }} className={`p-4 rounded-full ${isActive ? 'bg-yellow-600' : 'bg-green-600'}`}>{isActive ? <Pause size={24} /> : <Play size={24} />}</button>
+           )}
         </div>
         <button onClick={handleEndSession} disabled={isSaving} className="w-full py-3 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-300 text-sm font-semibold disabled:opacity-50">{isSaving ? "Saving..." : "End Session & Save"}</button>
       </div>
