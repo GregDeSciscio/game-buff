@@ -135,7 +135,7 @@ const GameBuffSession = ({ initialLoadout }) => {
         p_log: log
       });
       if (error) throw error;
-      navigate('/dashboard');
+      navigate(`/game/${loadout.id}`, { state: { loadout } });
     } catch (error) {
       console.error(error);
       alert('Failed to save session');
