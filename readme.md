@@ -139,7 +139,9 @@ The "Active Session" screen utilizes large hit-boxes and high-contrast colors (N
 
 ## 🔮 Future Roadmap
 
-- [ ] **Leaderboards:** Compare XP with friends.
+- [ ] **Biometrics & Calorie Tracking:** Store user height/weight to estimate calories burned per session using exercise MET values.
+- [ ] **Advanced Stats:** Visualizations for "Calories Burned per Game" and "XP vs. Time Played."
+- [ ] **Leaderboards:** Compare XP and Workout Volume with friends.
 - [ ] **Sound Effects:** 8-bit audio cues for "Level Up" and "Timer Complete."
 - [ ] **PWA Support:** Installable on iOS/Android home screens.
 - [ ] **Preset Library:** "Community Loadouts" for popular games (e.g., Warzone, League of Legends).
