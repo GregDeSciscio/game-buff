@@ -38,6 +38,9 @@ const TimerModal = ({ trigger, onComplete, onCancel }) => {
 
 const GameBuffSession = ({ initialLoadout }) => {
   const navigate = useNavigate();
+  // Use local state for loadout so we can update it with fresh DB data
+  const [loadout, setLoadout] = useState(initialLoadout);
+  
   const [isActive, setIsActive] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [totalReps, setTotalReps] = useState(0);
@@ -47,6 +50,23 @@ const GameBuffSession = ({ initialLoadout }) => {
   const [activeTimerTrigger, setActiveTimerTrigger] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
 
+  // 1. NEW: Fetch the latest version of this loadout immediately
+  useEffect(() => {
+    const fetchFreshLoadout = async () => {
+      const { data, error } = await supabase
+        .from('loadouts')
+        .select('*')
+        .eq('id', initialLoadout.id)
+        .single();
+      
+      if (data && !error) {
+        setLoadout(data);
+      }
+    };
+    fetchFreshLoadout();
+  }, [initialLoadout.id]);
+
+  // 2. Existing XP Fetch
   useEffect(() => {
     const fetchXP = async () => {
         const { data: { user } } = await supabase.auth.getUser();
@@ -96,7 +116,7 @@ const GameBuffSession = ({ initialLoadout }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
       const { error } = await supabase.rpc('finish_session', {
-        p_loadout_id: initialLoadout.id,
+        p_loadout_id: loadout.id, // Updated to use 'loadout.id'
         p_xp_gained: sessionXP,
         p_duration: seconds,
         p_log: log
@@ -118,12 +138,13 @@ const GameBuffSession = ({ initialLoadout }) => {
       {activeTimerTrigger && <TimerModal trigger={activeTimerTrigger} onComplete={logSuccess} onCancel={() => setActiveTimerTrigger(null)} />}
       
       <div className="flex justify-between items-center p-4 bg-slate-800 border-b border-slate-700 shadow-md">
-        <div><h2 className="text-xs text-slate-400 uppercase tracking-widest">Current Game</h2><h1 className="text-xl font-bold text-white">{initialLoadout.game_title}</h1></div>
+        <div><h2 className="text-xs text-slate-400 uppercase tracking-widest">Current Game</h2><h1 className="text-xl font-bold text-white">{loadout.game_title}</h1></div>
         <div className={`text-2xl font-mono font-bold ${isActive ? 'text-green-400' : 'text-slate-500'}`}>{formatTime(seconds)}</div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {initialLoadout.triggers.map((trigger, idx) => (
+        {/* Updated to map over 'loadout.triggers' instead of 'initialLoadout' */}
+        {loadout.triggers.map((trigger, idx) => (
           <button key={idx} onClick={() => handleTrigger(trigger)} className={`w-full py-8 rounded-xl shadow-lg transform transition active:scale-95 flex flex-col items-center justify-center ${trigger.color}`}>
             <span className="text-2xl font-black uppercase tracking-wider text-white drop-shadow-md">{trigger.label}</span>
             <span className="text-sm font-medium text-white/90 mt-1 bg-black/20 px-3 py-1 rounded-full">+{trigger.amount} {trigger.exercise}</span>

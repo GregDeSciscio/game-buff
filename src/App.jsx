@@ -7,7 +7,7 @@ import Auth from './components/Auth';
 import Dashboard from './components/Dashboard';
 import CreateLoadout from './components/CreateLoadout';
 import GameBuffSession from './components/GameBuffSession';
-import History from './components/History'; // Added import
+import History from './components/History';
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
@@ -64,6 +64,13 @@ const App = () => {
         } />
         
         <Route path="/create" element={
+          <ProtectedRoute>
+            <CreateLoadout />
+          </ProtectedRoute>
+        } />
+
+        {/* NEW EDIT ROUTE */}
+        <Route path="/edit/:id" element={
           <ProtectedRoute>
             <CreateLoadout />
           </ProtectedRoute>

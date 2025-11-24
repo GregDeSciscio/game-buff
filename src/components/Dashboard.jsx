@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import { Plus, Play, Trophy, LogOut, History } from 'lucide-react'; // Added History icon
+import { Plus, Play, Trophy, LogOut, History, Pencil } from 'lucide-react'; // Added Pencil
 import { getLevelProgress } from '../utilities/gameLogic';
 
 const Dashboard = () => {
@@ -48,7 +48,7 @@ const Dashboard = () => {
   const { currentLevel, progressPercent, neededXP, currentXP } = getLevelProgress(profile?.total_xp || 0);
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 p-4 font-sans pb-24">
+    <div className="min-h-screen bg-slate-900 text-slate-100 p-4 font-sans pb-24 safe-area-pb">
       
       {/* Top Bar */}
       <div className="flex justify-between items-center mb-6">
@@ -57,7 +57,6 @@ const Dashboard = () => {
         </h1>
         
         <div className="flex gap-4">
-          {/* History Button */}
           <button 
             onClick={() => navigate('/history')}
             className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white hover:bg-slate-700 transition"
@@ -66,7 +65,6 @@ const Dashboard = () => {
             <History size={20} />
           </button>
 
-          {/* Logout Button */}
           <button onClick={handleLogout} className="p-2 text-slate-500 hover:text-white" title="Logout">
             <LogOut size={20} />
           </button>
@@ -98,12 +96,27 @@ const Dashboard = () => {
               <p className="text-slate-400 text-xs">{loadout.triggers.length} Triggers defined</p>
             </div>
             
-            <button 
-              onClick={() => navigate('/session', { state: { loadout } })} 
-              className="bg-green-600 hover:bg-green-500 text-white p-3 rounded-full shadow-lg shadow-green-900/20"
-            >
-              <Play size={20} fill="currentColor" />
-            </button>
+            <div className="flex gap-3">
+              {/* EDIT BUTTON */}
+              <button 
+                onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/edit/${loadout.id}`);
+                }}
+                className="p-3 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-full transition-colors"
+                title="Edit Loadout"
+              >
+                <Pencil size={20} />
+              </button>
+
+              {/* PLAY BUTTON */}
+              <button 
+                onClick={() => navigate('/session', { state: { loadout } })} 
+                className="bg-green-600 hover:bg-green-500 text-white p-3 rounded-full shadow-lg shadow-green-900/20"
+              >
+                <Play size={20} fill="currentColor" />
+              </button>
+            </div>
           </div>
         ))}
 
