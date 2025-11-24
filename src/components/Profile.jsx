@@ -8,8 +8,9 @@ const Profile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [height, setHeight] = useState('');
-  const [weight, setWeight] = useState('');
+  const [heightFeet, setHeightFeet] = useState('');
+  const [heightInches, setHeightInches] = useState('');
+  const [weightLbs, setWeightLbs] = useState('');
 
   useEffect(() => {
     fetchProfile();
@@ -31,8 +32,22 @@ const Profile = () => {
       console.error('Error fetching profile', error);
     } else {
       setProfile(data);
-      setHeight(data?.height_cm ?? '');
-      setWeight(data?.weight_kg ?? '');
+      if (data?.height_cm) {
+        const totalInches = data.height_cm / 2.54;
+        const feet = Math.floor(totalInches / 12);
+        const inches = Math.round(totalInches - feet * 12);
+        setHeightFeet(feet || '');
+        setHeightInches(inches || '');
+      } else {
+        setHeightFeet('');
+        setHeightInches('');
+      }
+      if (data?.weight_kg) {
+        const lbs = Math.round(data.weight_kg * 2.20462);
+        setWeightLbs(lbs || '');
+      } else {
+        setWeightLbs('');
+      }
     }
     setLoading(false);
   };
@@ -42,9 +57,17 @@ const Profile = () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
+    const feetNum = Number(heightFeet);
+    const inchesNum = Number(heightInches);
+    const lbsNum = Number(weightLbs);
+
+    const totalInches = (!isNaN(feetNum) && !isNaN(inchesNum)) ? (feetNum * 12 + inchesNum) : null;
+    const cm = totalInches !== null && !isNaN(totalInches) && totalInches > 0 ? Math.round(totalInches * 2.54) : null;
+    const kg = !isNaN(lbsNum) && lbsNum > 0 ? Math.round((lbsNum / 2.20462) * 10) / 10 : null;
+
     const payload = {
-      height_cm: height === '' ? null : Number(height),
-      weight_kg: weight === '' ? null : Number(weight),
+      height_cm: cm,
+      weight_kg: kg,
     };
 
     const { error } = await supabase
@@ -102,25 +125,34 @@ const Profile = () => {
         <div className="flex items-center gap-3">
           <Ruler className="text-blue-400" size={18} />
           <div className="flex-1">
-            <label className="text-xs uppercase text-slate-400">Height (cm)</label>
-            <input
-              type="number"
-              value={height}
-              onChange={(e) => setHeight(e.target.value)}
-              placeholder="e.g. 180"
-              className="mt-1 w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            <label className="text-xs uppercase text-slate-400">Height (ft / in)</label>
+            <div className="mt-1 flex gap-2">
+              <input
+                type="number"
+                value={heightFeet}
+                onChange={(e) => setHeightFeet(e.target.value)}
+                placeholder="5"
+                className="w-20 bg-slate-900 border border-slate-700 rounded-lg p-3 text-white outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <input
+                type="number"
+                value={heightInches}
+                onChange={(e) => setHeightInches(e.target.value)}
+                placeholder="10"
+                className="w-24 bg-slate-900 border border-slate-700 rounded-lg p-3 text-white outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-3">
           <Weight className="text-blue-400" size={18} />
           <div className="flex-1">
-            <label className="text-xs uppercase text-slate-400">Weight (kg)</label>
+            <label className="text-xs uppercase text-slate-400">Weight (lbs)</label>
             <input
               type="number"
-              value={weight}
-              onChange={(e) => setWeight(e.target.value)}
-              placeholder="e.g. 75"
+              value={weightLbs}
+              onChange={(e) => setWeightLbs(e.target.value)}
+              placeholder="180"
               className="mt-1 w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
