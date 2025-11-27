@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import { Search, Sparkles, Globe2, Loader2, ChevronDown, Timer } from 'lucide-react';
+import { Search, Sparkles, Globe2, Loader2, ChevronDown, Timer, Flame, Zap } from 'lucide-react';
 import BottomNav from './BottomNav';
 
 const Explore = () => {
@@ -13,6 +13,17 @@ const Explore = () => {
   const [search, setSearch] = useState('');
   const [copyingId, setCopyingId] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
+  const [userWeightKg, setUserWeightKg] = useState(75);
+
+  useEffect(() => {
+    const fetchWeight = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase.from('profiles').select('weight_kg').eq('id', user.id).single();
+      if (data?.weight_kg) setUserWeightKg(data.weight_kg);
+    };
+    fetchWeight();
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -64,6 +75,42 @@ const Explore = () => {
     }
   };
 
+  const estimateCalories = (trigger) => {
+    const weight = userWeightKg || 75;
+    const name = (trigger.exercise || '').toLowerCase();
+    const metTable = {
+      pushups: 8,
+      burpees: 10,
+      squats: 5.5,
+      lunges: 5.5,
+      situps: 4,
+      crunches: 4,
+      plank: 3.3,
+      'jumping jacks': 8,
+      pullups: 8,
+      running: 9,
+      jog: 7,
+    };
+    const matchedMet = Object.entries(metTable).find(([key]) => name.includes(key))?.[1];
+    const met = matchedMet || 5;
+    let seconds = 0;
+    if (trigger.type === 'timer') {
+      seconds = trigger.amount || 0;
+    } else {
+      const reps = trigger.amount || 0;
+      seconds = reps * 2;
+    }
+    return met * weight * (seconds / 3600);
+  };
+
+  const estimateXP = (trigger) => {
+    // Rough align with gameLogic: 1 rep = 10 XP; timer 1s = 5 XP; simple multiplier not known here.
+    if (trigger.type === 'timer') {
+      return (trigger.amount || 0) * 5;
+    }
+    return (trigger.amount || 0) * 10;
+  };
+
   const renderList = (items, type) => {
     if (loading) return <div className="flex items-center gap-2 text-slate-400 text-sm"><Loader2 className="animate-spin" size={14} /> Loading...</div>;
     if (items.length === 0) return <p className="text-sm text-slate-500">No {type} loadouts found.</p>;
@@ -102,6 +149,8 @@ const Explore = () => {
               <div className="mt-3 space-y-2 border-t border-slate-700 pt-3">
                 {item.triggers.map((t, idx) => {
                   const isTimer = t.type === 'timer';
+                  const kcal = estimateCalories(t);
+                  const xp = estimateXP(t);
                   return (
                     <div key={idx} className="flex justify-between text-xs text-slate-200 bg-slate-900/60 rounded px-2 py-1">
                       <div className="flex flex-col">
@@ -112,6 +161,12 @@ const Explore = () => {
                         <span className="block">{t.amount}{isTimer ? 's' : ' reps'}</span>
                         <span className="block flex items-center gap-1 justify-end">
                           <Timer size={10} /> {isTimer ? 'Timer' : 'Reps'}
+                        </span>
+                        <span className="block flex items-center gap-1 justify-end text-orange-300">
+                          <Flame size={10} /> ~{Math.round(kcal)} kcal
+                        </span>
+                        <span className="block flex items-center gap-1 justify-end text-yellow-300">
+                          <Zap size={10} /> ~{Math.round(xp)} XP
                         </span>
                       </div>
                     </div>
