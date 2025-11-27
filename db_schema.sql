@@ -94,13 +94,14 @@ create policy "Users manage own streaks" on streaks for all using (auth.uid() = 
 create policy "Users manage own badges" on badges for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 -- FUNCTIONS & TRIGGERS --
-create or replace function finish_session(p_loadout_id uuid, p_xp_gained int, p_duration int, p_log jsonb, p_calories numeric default 0) returns void as $$
+create or replace function finish_session(p_loadout_id uuid, p_xp_gained int, p_duration int, p_log jsonb, p_calories numeric default 0) returns jsonb as $$
 declare
   today date := timezone('utc'::text, now())::date;
   streak_record streaks;
   new_current int;
   new_longest int;
   total_sessions int;
+  unlocked text[];
 begin
   insert into sessions (user_id, loadout_id, total_xp_gained, duration_seconds, calories_burned, log_summary)
   values (auth.uid(), p_loadout_id, p_xp_gained, p_duration, coalesce(p_calories,0), p_log);
@@ -135,20 +136,25 @@ begin
   if total_sessions >= 10 then
     insert into badges (user_id, badge_key) values (auth.uid(), 'sessions_10')
     on conflict (user_id, badge_key) do nothing;
+    unlocked := array_append(unlocked, 'sessions_10');
   end if;
   if total_sessions >= 25 then
     insert into badges (user_id, badge_key) values (auth.uid(), 'sessions_25')
     on conflict (user_id, badge_key) do nothing;
+    unlocked := array_append(unlocked, 'sessions_25');
   end if;
   if total_sessions >= 50 then
     insert into badges (user_id, badge_key) values (auth.uid(), 'sessions_50')
     on conflict (user_id, badge_key) do nothing;
+    unlocked := array_append(unlocked, 'sessions_50');
   end if;
 
   if new_longest >= 7 then
     insert into badges (user_id, badge_key) values (auth.uid(), 'streak_7')
     on conflict (user_id, badge_key) do nothing;
+    unlocked := array_append(unlocked, 'streak_7');
   end if;
+  return jsonb_build_object('unlocked_badges', unlocked);
 end;
 $$ language plpgsql security definer;
 

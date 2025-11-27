@@ -75,3 +75,5 @@ create policy "Anyone can see public/preset loadouts"
   on loadouts
   for select
   using (visibility in ('public','preset'));
+
+-- Ensure finish_session returns unlocked badges (function already created in schema)

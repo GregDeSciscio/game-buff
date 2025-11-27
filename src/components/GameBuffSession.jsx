@@ -59,6 +59,7 @@ const GameBuffSession = ({ initialLoadout }) => {
   const [showMedia, setShowMedia] = useState(true);
   const [burst, setBurst] = useState(false);
   const [levelPulse, setLevelPulse] = useState(false);
+  const [unlockedBadges, setUnlockedBadges] = useState([]);
   const hasTimerTriggers = loadout?.triggers?.some((t) => t.type === 'timer');
 
   // 1. NEW: Fetch the latest version of this loadout immediately
@@ -144,7 +145,7 @@ const GameBuffSession = ({ initialLoadout }) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      const { error } = await supabase.rpc('finish_session', {
+      const { data, error } = await supabase.rpc('finish_session', {
         p_loadout_id: loadout.id, // Updated to use 'loadout.id'
         p_xp_gained: sessionXP,
         p_duration: seconds,
@@ -152,6 +153,10 @@ const GameBuffSession = ({ initialLoadout }) => {
         p_calories: sessionCalories
       });
       if (error) throw error;
+      if (data?.unlocked_badges && Array.isArray(data.unlocked_badges)) {
+        setUnlockedBadges(data.unlocked_badges);
+        setTimeout(() => setUnlockedBadges([]), 4000);
+      }
       navigate(`/game/${loadout.id}`, { state: { loadout } });
     } catch (error) {
       console.error(error);
