@@ -407,6 +407,7 @@ const Game = () => {
               <div className="space-y-3">
                 {recentSessions.map((session) => {
                   const exerciseSummary = aggregateExercises(session);
+                  const logEntries = parseLog(session.log_summary).slice(0, 3);
                   return (
                     <div
                       key={session.id}
@@ -430,22 +431,32 @@ const Game = () => {
                           )}
                         </div>
                       </div>
-                    <div className="text-right text-xs text-slate-400 flex flex-col items-end gap-2">
-                      <div className="text-right">
-                        <span className="block">
-                          {Math.floor(session.duration_seconds / 60)}m {session.duration_seconds % 60}s
-                        </span>
-                        <span className="block">{repsFromSession(session)} reps</span>
-                        {session.calories_burned !== null && session.calories_burned !== undefined && (
-                          <span className="block text-orange-300 flex items-center gap-1 justify-end">
-                            <Flame size={12} /> ~{Math.round(session.calories_burned)} kcal
+                      <div className="text-right text-xs text-slate-400 flex flex-col items-end gap-2">
+                        <div className="text-right">
+                          <span className="block">
+                            {Math.floor(session.duration_seconds / 60)}m {session.duration_seconds % 60}s
                           </span>
+                          <span className="block">{repsFromSession(session)} reps</span>
+                          {session.calories_burned !== null && session.calories_burned !== undefined && (
+                            <span className="block text-orange-300 flex items-center gap-1 justify-end">
+                              <Flame size={12} /> ~{Math.round(session.calories_burned)} kcal
+                            </span>
+                          )}
+                        </div>
+                        {logEntries.length > 0 && (
+                          <div className="flex flex-wrap gap-2 justify-end">
+                            {logEntries.map((entry, idx) => (
+                              <span key={idx} className="px-2 py-1 rounded-full bg-slate-900 border border-slate-800 text-[11px] text-slate-200 flex items-center gap-1">
+                                {entry.message || entry.exercise || 'Entry'}
+                                {entry.calories ? <><Flame size={10} className="text-orange-300" /> ~{Math.round(entry.calories)} kcal</> : null}
+                              </span>
+                            ))}
+                          </div>
                         )}
-                      </div>
-                      <button
-                        onClick={() => handleDelete(session)}
-                        disabled={deletingId === session.id}
-                        className="inline-flex items-center gap-1 text-xs px-3 py-2 rounded-lg border border-red-500 text-red-300 hover:bg-red-500 hover:text-white transition disabled:opacity-50"
+                        <button
+                          onClick={() => handleDelete(session)}
+                          disabled={deletingId === session.id}
+                          className="inline-flex items-center gap-1 text-xs px-3 py-2 rounded-lg border border-red-500 text-red-300 hover:bg-red-500 hover:text-white transition disabled:opacity-50"
                           title="Deletes the session and removes the XP gained"
                         >
                           <Trash2 size={14} />

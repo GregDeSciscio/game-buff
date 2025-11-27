@@ -81,6 +81,19 @@ const History = () => {
     });
   };
 
+  const parseLog = (log) => {
+    if (Array.isArray(log)) return log;
+    if (typeof log === 'string') {
+      try {
+        const parsed = JSON.parse(log);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  };
+
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 p-4 font-sans pb-32 safe-area-pb">
       
@@ -129,6 +142,14 @@ const History = () => {
                       <Flame size={14} /> ~{Math.round(session.calories_burned)} kcal
                     </span>
                   )}
+                </div>
+                <div className="flex flex-wrap gap-2 text-[11px] text-slate-300">
+                  {parseLog(session.log_summary).slice(0, 3).map((entry, idx) => (
+                    <span key={idx} className="px-2 py-1 rounded-full bg-slate-900/80 border border-slate-800 flex items-center gap-1">
+                      {entry.message || entry.exercise || 'Entry'}
+                      {entry.calories ? <><Flame size={10} className="text-orange-300" /> ~{Math.round(entry.calories)} kcal</> : null}
+                    </span>
+                  ))}
                 </div>
                 <button
                   onClick={() => handleDelete(session)}
