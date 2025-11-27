@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import { Plus, Play, Trophy, LogOut, Pencil, User, Users } from 'lucide-react'; // Added Pencil
+import { Plus, Play, Trophy, LogOut, Pencil, User, Users, Eye } from 'lucide-react'; // Added Pencil
 import { getLevelProgress } from '../utilities/gameLogic';
 import BottomNav from './BottomNav';
 
