@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { ArrowLeft, Save, User, Ruler, Weight } from 'lucide-react';
 import BottomNav from './BottomNav';
+import BadgesCatalog from './BadgesCatalog';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -184,6 +185,9 @@ const Profile = () => {
             </>
           )}
         </button>
+      </div>
+      <div className="mt-6">
+        <BadgesCatalog />
       </div>
       <BottomNav />
     </div>
