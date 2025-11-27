@@ -113,28 +113,31 @@ const GameBuffSession = ({ initialLoadout }) => {
   };
 
   const estimateCalories = (trigger) => {
-    // MET values by exercise; defaults to moderate effort
+    const weight = userWeightKg || 75;
+    const name = (trigger.exercise || '').toLowerCase();
     const metTable = {
       pushups: 8,
       burpees: 10,
-      squats: 6,
-      lunges: 6,
+      squats: 5.5,
+      lunges: 5.5,
       situps: 4,
+      crunches: 4,
       plank: 3.3,
       'jumping jacks': 8,
       pullups: 8,
+      running: 9,
+      jog: 7,
     };
-    const weight = userWeightKg || 75;
-    const exerciseKey = (trigger.exercise || '').toLowerCase();
-    const met = metTable[exerciseKey] || 4;
+    const matchedMet = Object.entries(metTable).find(([key]) => name.includes(key))?.[1];
+    const met = matchedMet || 5; // moderate default
 
     let seconds = 0;
     if (trigger.type === 'timer') {
       seconds = trigger.amount || 0;
     } else {
-      // rough estimate: 2.5 seconds per rep
+      // rough estimate: 2 seconds per rep
       const reps = trigger.amount || 0;
-      seconds = reps * 2.5;
+      seconds = reps * 2;
     }
     return met * weight * (seconds / 3600);
   };
