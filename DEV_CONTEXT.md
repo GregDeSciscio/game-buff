@@ -39,6 +39,7 @@
 - **friends:** `id`, `requester_id`, `addressee_id`, `status` (pending/accepted/blocked), `created_at`
 
 ## 5. Changelog
+- **[Latest] Seed Data Script:** Added `supabase_seed.sql` to insert sample users/profiles/loadouts/sessions/friends (requires real auth user IDs).
 - **[Latest] Explore Page:** Added `/explore` with Presets/Community tabs; bottom nav includes Explore link.
 - **Share & Attribution:** Visibility picker clarifies sharing; presets/community section shows attribution and copy badge.
 - **Loadout Visibility Badges:** Dashboard shows Private/Public/Preset badges for each loadout.
