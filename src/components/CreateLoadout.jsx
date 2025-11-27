@@ -10,6 +10,8 @@ const CreateLoadout = () => {
   const { id } = useParams(); // Capture ID from URL to check if we are editing
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const [loadoutOwnerId, setLoadoutOwnerId] = useState(null);
   const [visibility, setVisibility] = useState('private');
   const [sourceLoadoutId, setSourceLoadoutId] = useState(null);
   const [presets, setPresets] = useState([]);
@@ -24,6 +26,11 @@ const CreateLoadout = () => {
 
   // Load existing data if editing
   useEffect(() => {
+    const initUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUserId(user?.id || null);
+    };
+    initUser();
     if (id) {
       fetchLoadout();
     }
@@ -46,6 +53,7 @@ const CreateLoadout = () => {
       setTriggers(data.triggers);
       setVisibility(data.visibility || 'private');
       setSourceLoadoutId(data.source_loadout_id || null);
+      setLoadoutOwnerId(data.user_id);
     }
     setLoading(false);
   };
@@ -128,6 +136,14 @@ const CreateLoadout = () => {
   if (loading && id && !gameTitle) return <div className="min-h-screen bg-slate-900 flex items-center justify-center text-white">Loading Loadout...</div>;
 
   const handleDelete = async () => {
+    if (!currentUserId || loadoutOwnerId !== currentUserId) {
+      alert('You cannot delete a loadout you do not own.');
+      return;
+    }
+    if (visibility === 'preset') {
+      alert('Preset loadouts cannot be deleted.');
+      return;
+    }
     const confirmed = window.confirm('Delete this game/loadout? This will remove it and any dependent data. This cannot be undone.');
     if (!confirmed) return;
     setDeleting(true);
@@ -199,6 +215,12 @@ const CreateLoadout = () => {
       <div className="mb-6">
         <label className="block text-xs uppercase tracking-wider text-slate-400 mb-2">Game Name</label>
         <input type="text" value={gameTitle} onChange={(e) => setGameTitle(e.target.value)} placeholder="e.g. Call of Duty" className="w-full bg-slate-800 border border-slate-700 text-white rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all" />
+        {id && loadoutOwnerId && currentUserId && loadoutOwnerId !== currentUserId && (
+          <p className="text-[11px] text-red-400 mt-1">You cannot edit or delete this loadout because it belongs to another user.</p>
+        )}
+        {id && visibility === 'preset' && (
+          <p className="text-[11px] text-red-400 mt-1">Preset loadouts cannot be deleted.</p>
+        )}
       </div>
 
       <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-3">
