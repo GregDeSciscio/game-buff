@@ -10,6 +10,7 @@ import GameBuffSession from './components/GameBuffSession';
 import History from './components/History';
 import Game from './components/Game';
 import Profile from './components/Profile';
+import Leaderboard from './components/Leaderboard';
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
@@ -99,6 +100,12 @@ const App = () => {
         <Route path="/profile" element={
           <ProtectedRoute>
             <Profile />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/leaderboard" element={
+          <ProtectedRoute>
+            <Leaderboard />
           </ProtectedRoute>
         } />
 

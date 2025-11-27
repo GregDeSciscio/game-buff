@@ -2,11 +2,23 @@
 create table profiles (
   id uuid references auth.users not null primary key,
   username text,
+  display_name text,
   total_xp bigint default 0,
   current_level int default 1,
   height_cm numeric,
   weight_kg numeric
 );
+
+-- Friends (social graph)
+create table friends (
+  id uuid default uuid_generate_v4() primary key,
+  requester_id uuid not null references profiles(id),
+  addressee_id uuid not null references profiles(id),
+  status text not null check (status in ('pending', 'accepted', 'blocked')),
+  created_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+create unique index friends_unique_pair on friends (requester_id, addressee_id);
 
 create table loadouts (
   id uuid default uuid_generate_v4() primary key,
@@ -48,6 +60,12 @@ create policy "Users can create sessions" on sessions for insert with check (aut
 create policy "Users can delete own sessions" on sessions for delete using (auth.uid() = user_id);
 -- [FIX FOR HISTORY JOIN]
 alter table sessions drop constraint if exists sessions_loadout_id_fkey, add constraint sessions_loadout_id_fkey foreign key (loadout_id) references loadouts(id) on delete set null;
+
+-- Friends RLS
+alter table friends enable row level security;
+create policy "Users can view their friendships" on friends for select using (auth.uid() = requester_id or auth.uid() = addressee_id);
+create policy "Users can request friends" on friends for insert with check (auth.uid() = requester_id);
+create policy "Users can update their friendships" on friends for update using (auth.uid() = requester_id or auth.uid() = addressee_id);
 
 -- FUNCTIONS & TRIGGERS --
 create or replace function finish_session(p_loadout_id uuid, p_xp_gained int, p_duration int, p_log jsonb) returns void as $$

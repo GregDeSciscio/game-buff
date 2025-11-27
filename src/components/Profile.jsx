@@ -8,6 +8,7 @@ const Profile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [displayName, setDisplayName] = useState('');
   const [heightFeet, setHeightFeet] = useState('');
   const [heightInches, setHeightInches] = useState('');
   const [weightLbs, setWeightLbs] = useState('');
@@ -32,6 +33,7 @@ const Profile = () => {
       console.error('Error fetching profile', error);
     } else {
       setProfile(data);
+      setDisplayName(data?.display_name || '');
       if (data?.height_cm) {
         const totalInches = data.height_cm / 2.54;
         const feet = Math.floor(totalInches / 12);
@@ -66,6 +68,7 @@ const Profile = () => {
     const kg = !isNaN(lbsNum) && lbsNum > 0 ? Math.round((lbsNum / 2.20462) * 10) / 10 : null;
 
     const payload = {
+      display_name: displayName?.trim() || null,
       height_cm: cm,
       weight_kg: kg,
     };
@@ -110,6 +113,18 @@ const Profile = () => {
         <div className="flex justify-between text-sm text-slate-300">
           <span>Username</span>
           <span className="text-white font-semibold">{profile?.username || '—'}</span>
+        </div>
+        <div className="text-sm text-slate-300">
+          <div className="flex justify-between items-center mb-1">
+            <span>Display Name</span>
+          </div>
+          <input
+            type="text"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            placeholder="Public name for leaderboards"
+            className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </div>
         <div className="flex justify-between text-sm text-slate-300">
           <span>Total XP</span>

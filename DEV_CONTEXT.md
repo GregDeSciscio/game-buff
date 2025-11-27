@@ -33,27 +33,30 @@
 - **Database:** RLS policies set for Select, Insert, and Update.
 
 ## 4. Database Schema (Snapshot)
-- **profiles:** `id` (auth link), `username`, `total_xp`, `current_level`
+- **profiles:** `id` (auth link), `username`, `display_name`, `total_xp`, `current_level`, `height_cm`, `weight_kg`
 - **loadouts:** `id`, `user_id`, `game_title`, `triggers` (JSONB Array)
 - **sessions:** `id`, `user_id`, `loadout_id`, `total_xp_gained`, `duration_seconds`, `log_summary` (JSONB)
+- **friends:** `id`, `requester_id`, `addressee_id`, `status` (pending/accepted/blocked), `created_at`
 
 ## 5. Changelog
-- **[Latest] Profile Height/Weight (US UI):** Profile screen accepts feet/inches and lbs, storing them as cm/kg in Supabase.
-- **Post-session Redirect:** Ending a session now returns to the game detail page instead of dashboard.
-- **Detailed Activity:** Game page now shows top exercises (today & last 7 days) alongside rep totals.
-- **[Latest] Streamlined Session UI:** Auto-start sessions on first tap; hide play/pause and timer modal for rep-only loadouts.
-- **[Latest] Dashboard Controls:** Play button now goes straight to session; added view icon to open game details.
-- **Game-level Session Purge:** `/game/:id` now supports deleting all sessions for a game with XP rollback and warning.
-- **Session Deletion Fix:** Frontend now subtracts XP only after a successful delete; added sessions delete RLS policy to schema.
-- **[Latest] Enhanced Game Page Detail:** Added per-exercise breakdown and timeframe filter to recent sessions on `/game/:id`.
-- **Added Game Page & Activity Stats:** New `/game/:id` route shows per-game rep totals (today/yesterday/7/30) and recent sessions before starting a session.
-- **[Latest] Added Sound FX:** Web Audio click cues on buttons and timer completion chime in GameBuffSession.
-- **[Latest] Added PWA Manifest:** Added `manifest.webmanifest`, install icons, and head tags for Add to Home Screen compatibility.
-- **[Latest] Fixed RLS Update Policy:** Added policy to allow `UPDATE` on loadouts table so edits persist.
-- **Added Edit Functionality:** Refactored `CreateLoadout` to handle `id` param for editing.
-- **Added History:** Created `History.jsx` and updated Dashboard to link to it.
-- **Added SPA Routing:** Added `vercel.json` to fix 404s on refresh.
-- **Added Timer Logic:** Smart detection of time-based exercises (e.g., Plank) triggers a countdown modal.
+- **[Latest] Display Name + Leaderboards:** Profiles now support public `display_name`; leaderboards show display names (fallback to username).
+- **Leaderboards (Global/Friends) + Friends Schema:** Added friends table + RLS, new `/leaderboard` screen with global and friends tabs, dashboard link.
+- **Profile Height/Weight (US UI):** Profile screen accepts ft/in and lbs (stored as cm/kg).
+- **Post-session Redirect:** Ending a session returns to the game detail page instead of dashboard.
+- **Detailed Activity:** Game page shows top exercises (today & last 7 days) alongside rep totals.
+- **Streamlined Session UI:** Auto-start on first tap; hide play/pause and timer modal for rep-only loadouts.
+- **Dashboard Controls:** Play button goes straight to session; added view icon for game details.
+- **Game-level Session Purge:** `/game/:id` supports deleting all sessions with XP rollback and warning.
+- **Session Deletion Fix:** Subtract XP only after successful delete; added sessions delete RLS policy.
+- **Enhanced Game Page Detail:** Added per-exercise breakdown and timeframe filter on `/game/:id`.
+- **Game Page & Activity Stats:** `/game/:id` shows per-game rep totals (today/yesterday/7/30) and recent sessions before starting a session.
+- **Added Sound FX:** Web Audio click cues and timer completion chime.
+- **PWA Manifest:** Added `manifest.webmanifest`, install icons, and head tags for Add to Home Screen.
+- **Loadouts Update Policy:** Added RLS update policy so loadout edits persist.
+- **Loadout Edit:** `CreateLoadout` handles `id` param for editing.
+- **History Page:** Added `History.jsx` and dashboard link.
+- **SPA Routing:** Added `vercel.json` to fix 404s on refresh.
+- **Timer Logic:** Smart detection of timer exercises shows countdown modal.
 
 ## 6. Immediate Roadmap (Next Steps)
 1.  **Biometrics:** Add Height/Weight to profile for Calorie estimation.
