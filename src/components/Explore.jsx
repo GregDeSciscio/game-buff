@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import { Search, Sparkles, Globe2, Loader2, ChevronDown } from 'lucide-react';
+import { Search, Sparkles, Globe2, Loader2, ChevronDown, Timer } from 'lucide-react';
 import BottomNav from './BottomNav';
 
 const Explore = () => {
@@ -100,12 +100,23 @@ const Explore = () => {
             </div>
             {expandedId === item.id && item.triggers?.length ? (
               <div className="mt-3 space-y-2 border-t border-slate-700 pt-3">
-                {item.triggers.map((t, idx) => (
-                  <div key={idx} className="flex justify-between text-xs text-slate-200 bg-slate-900/60 rounded px-2 py-1">
-                    <span>{t.label || 'Trigger'}</span>
-                    <span className="text-slate-400">{t.amount}{t.type === 'timer' ? 's' : ' reps'} {t.exercise}</span>
-                  </div>
-                ))}
+                {item.triggers.map((t, idx) => {
+                  const isTimer = t.type === 'timer';
+                  return (
+                    <div key={idx} className="flex justify-between text-xs text-slate-200 bg-slate-900/60 rounded px-2 py-1">
+                      <div className="flex flex-col">
+                        <span>{t.label || 'Trigger'}</span>
+                        <span className="text-[11px] text-slate-500">{t.exercise}</span>
+                      </div>
+                      <div className="text-right text-slate-400">
+                        <span className="block">{t.amount}{isTimer ? 's' : ' reps'}</span>
+                        <span className="block flex items-center gap-1 justify-end">
+                          <Timer size={10} /> {isTimer ? 'Timer' : 'Reps'}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             ) : null}
           </div>
