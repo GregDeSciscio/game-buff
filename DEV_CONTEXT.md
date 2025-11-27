@@ -39,7 +39,8 @@
 - **friends:** `id`, `requester_id`, `addressee_id`, `status` (pending/accepted/blocked), `created_at`
 
 ## 5. Changelog
-- **[Latest] Display Name + Leaderboards:** Profiles now support public `display_name`; leaderboards show display names (fallback to username).
+- **[Latest] Friends UX:** Added `/friends` screen for requests, sent, friends, and add-by-search; dashboard link.
+- **Display Name + Leaderboards:** Profiles now support public `display_name`; leaderboards show display names (fallback to username).
 - **Leaderboards (Global/Friends) + Friends Schema:** Added friends table + RLS, new `/leaderboard` screen with global and friends tabs, dashboard link.
 - **Profile Height/Weight (US UI):** Profile screen accepts ft/in and lbs (stored as cm/kg).
 - **Post-session Redirect:** Ending a session returns to the game detail page instead of dashboard.

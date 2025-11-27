@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import { Plus, Play, Trophy, LogOut, History, Pencil, Eye, User, Trophy as TrophyIcon } from 'lucide-react'; // Added Pencil
+import { Plus, Play, Trophy, LogOut, History, Pencil, Eye, User, Trophy as TrophyIcon, Users } from 'lucide-react'; // Added Pencil
 import { getLevelProgress } from '../utilities/gameLogic';
 
 const Dashboard = () => {
@@ -57,6 +57,14 @@ const Dashboard = () => {
         </h1>
         
         <div className="flex gap-4">
+          <button
+            onClick={() => navigate('/friends')}
+            className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white hover:bg-slate-700 transition"
+            title="Friends"
+          >
+            <Users size={20} />
+          </button>
+
           <button
             onClick={() => navigate('/leaderboard')}
             className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white hover:bg-slate-700 transition"

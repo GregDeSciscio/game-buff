@@ -11,6 +11,7 @@ import History from './components/History';
 import Game from './components/Game';
 import Profile from './components/Profile';
 import Leaderboard from './components/Leaderboard';
+import Friends from './components/Friends';
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
@@ -106,6 +107,12 @@ const App = () => {
         <Route path="/leaderboard" element={
           <ProtectedRoute>
             <Leaderboard />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/friends" element={
+          <ProtectedRoute>
+            <Friends />
           </ProtectedRoute>
         } />
 
