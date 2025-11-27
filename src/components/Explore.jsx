@@ -4,6 +4,7 @@ import { supabase } from '../supabaseClient';
 import { Search, Sparkles, Globe2, Loader2, ChevronDown, Timer, Flame, Zap } from 'lucide-react';
 import { calculateXP } from '../utilities/gameLogic';
 import { calculateCalories } from '../utilities/calories';
+import { getExerciseMedia } from '../utilities/exerciseMedia';
 import BottomNav from './BottomNav';
 
 const Explore = () => {
@@ -122,10 +123,18 @@ const Explore = () => {
                   const kcal = calculateCalories(t, userWeightKg || 75);
                   const xp = estimateXP(t);
                   return (
-                    <div key={idx} className="flex justify-between text-xs text-slate-200 bg-slate-900/60 rounded px-2 py-1">
-                      <div className="flex flex-col">
-                        <span>{t.label || 'Trigger'}</span>
-                        <span className="text-[11px] text-slate-500">{t.exercise}</span>
+                    <div key={idx} className="flex justify-between text-xs text-slate-200 bg-slate-900/60 rounded px-2 py-2">
+                      <div className="flex items-center gap-2">
+                        {getExerciseMedia(t.exercise) && (
+                          <span className="relative w-8 h-8 rounded-full overflow-hidden border border-white/10 shrink-0">
+                            <span className="absolute inset-0 bg-gradient-to-br from-emerald-400/70 via-sky-400/70 to-purple-500/70 animate-[spin_3s_linear_infinite] opacity-70" />
+                            <span className="absolute inset-1 bg-slate-900/70 rounded-full" />
+                          </span>
+                        )}
+                        <div className="flex flex-col">
+                          <span>{t.label || 'Trigger'}</span>
+                          <span className="text-[11px] text-slate-500">{t.exercise}</span>
+                        </div>
                       </div>
                       <div className="text-right text-slate-400">
                         <span className="block">{t.amount}{isTimer ? 's' : ' reps'}</span>

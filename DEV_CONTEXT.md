@@ -39,7 +39,7 @@
 - **friends:** `id`, `requester_id`, `addressee_id`, `status` (pending/accepted/blocked), `created_at`
 
 ## 5. Changelog
-- **[Latest] Animated Exercise Previews:** Session triggers can show animated cues per exercise (toggleable); centralized calories helper retained.
+- **[Latest] Animated Exercise Previews:** Session triggers and loadout builder show animated cues with a toggle; centralized calories helper retained.
 - **Animated Loadout Builder:** Create/Edit loadouts now show animated cues per exercise with a toggle.
 - **Hide Presets in My Loadouts:** Dashboard excludes preset visibility so users aren't stuck with non-removable presets; manage presets via Explore instead.
 - **Shared Calories Helper:** Centralized MET-based calories calculation; used in session logging and explore previews for consistent kcal/XP estimates.

@@ -57,6 +57,8 @@ const GameBuffSession = ({ initialLoadout }) => {
   const [activeTimerTrigger, setActiveTimerTrigger] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [showMedia, setShowMedia] = useState(true);
+  const [burst, setBurst] = useState(false);
+  const [levelPulse, setLevelPulse] = useState(false);
   const hasTimerTriggers = loadout?.triggers?.some((t) => t.type === 'timer');
 
   // 1. NEW: Fetch the latest version of this loadout immediately
@@ -113,6 +115,8 @@ const GameBuffSession = ({ initialLoadout }) => {
     } else {
       logSuccess(trigger);
     }
+    setBurst(true);
+    setTimeout(() => setBurst(false), 700);
   };
 
   const logSuccess = (trigger) => {
@@ -158,11 +162,33 @@ const GameBuffSession = ({ initialLoadout }) => {
   };
 
   const { currentLevel, progressPercent, neededXP, currentXP } = getLevelProgress(userTotalXP + sessionXP);
+  const prevLevelRef = React.useRef(currentLevel);
+  useEffect(() => {
+    if (currentLevel > prevLevelRef.current) {
+      setLevelPulse(true);
+      setTimeout(() => setLevelPulse(false), 1000);
+    }
+    prevLevelRef.current = currentLevel;
+  }, [currentLevel]);
 
   return (
     <div className="flex flex-col h-screen bg-slate-900 text-slate-100 font-sans pb-32">
       {hasTimerTriggers && activeTimerTrigger && (
         <TimerModal trigger={activeTimerTrigger} onComplete={logSuccess} onCancel={() => setActiveTimerTrigger(null)} />
+      )}
+      {burst && (
+        <div className="pointer-events-none fixed inset-0 z-40">
+          <div className="absolute inset-0 animate-[fade_0.7s_ease-out] bg-gradient-to-br from-transparent via-white/10 to-transparent" />
+          <div className="absolute inset-0 flex flex-wrap opacity-70 animate-[fade_0.7s_ease-out]">
+            {[...Array(12)].map((_, i) => (
+              <span
+                key={i}
+                className="w-2 h-2 rounded-full bg-emerald-300"
+                style={{ transform: `translate(${(i % 4) * 80}px, ${Math.floor(i / 4) * 80}px)` }}
+              />
+            ))}
+          </div>
+        </div>
       )}
       
       <div className="flex justify-between items-center p-4 bg-slate-800 border-b border-slate-700 shadow-md">
@@ -201,7 +227,7 @@ const GameBuffSession = ({ initialLoadout }) => {
 
       <div className="bg-slate-800 p-4 border-t border-slate-700 safe-area-pb">
         <div className="w-full bg-slate-700 h-4 rounded-full mb-4 overflow-hidden relative">
-            <div className="bg-yellow-500 h-full transition-all duration-500 ease-out" style={{ width: `${progressPercent}%` }} />
+            <div className={`bg-yellow-500 h-full transition-all duration-500 ease-out ${levelPulse ? 'animate-pulse' : ''}`} style={{ width: `${progressPercent}%` }} />
             <div className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-white shadow-black drop-shadow-md">LEVEL {currentLevel} ({Math.floor(currentXP)} / {neededXP} XP)</div>
         </div>
         <div className="flex justify-between items-center mb-4">
