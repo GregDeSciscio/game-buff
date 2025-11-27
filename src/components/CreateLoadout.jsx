@@ -3,6 +3,7 @@ import { supabase } from '../supabaseClient';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Plus, Trash2, Save, Gamepad2, ArrowLeft, Share2 } from 'lucide-react';
 import BottomNav from './BottomNav';
+import { getExerciseMedia } from '../utilities/exerciseMedia';
 
 const CreateLoadout = () => {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ const CreateLoadout = () => {
   const [presets, setPresets] = useState([]);
   const [community, setCommunity] = useState([]);
   const [loadingPresets, setLoadingPresets] = useState(false);
+  const [showMedia, setShowMedia] = useState(true);
 
   const [gameTitle, setGameTitle] = useState('');
   const [triggers, setTriggers] = useState([
@@ -184,6 +186,14 @@ const CreateLoadout = () => {
         <h1 className="text-2xl font-bold text-white flex items-center gap-2">
           <Gamepad2 className="text-blue-400" /> {id ? 'Edit Loadout' : 'New Loadout'}
         </h1>
+        <div className="ml-auto">
+          <button
+            onClick={() => setShowMedia(!showMedia)}
+            className="text-[11px] text-slate-400 hover:text-white px-3 py-1 border border-slate-700 rounded-full"
+          >
+            {showMedia ? 'Hide animations' : 'Show animations'}
+          </button>
+        </div>
       </div>
 
       <div className="mb-6">
@@ -271,6 +281,15 @@ const CreateLoadout = () => {
                   <input type="number" value={trigger.amount} onChange={(e) => updateTrigger(trigger.id, 'amount', parseInt(e.target.value) || 0)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-center transition-colors" />
                 </div>
               </div>
+              {showMedia && getExerciseMedia(trigger.exercise) && (
+                <div className="flex items-center gap-2 text-xs text-slate-300">
+                  <span className="relative w-8 h-8 rounded-full overflow-hidden border border-white/10">
+                    <span className="absolute inset-0 bg-gradient-to-br from-emerald-400/70 via-sky-400/70 to-purple-500/70 animate-[spin_3s_linear_infinite] opacity-70" />
+                    <span className="absolute inset-1 bg-slate-900/70 rounded-full" />
+                  </span>
+                  <span>Animated cue preview</span>
+                </div>
+              )}
               <div>
                 <label className="text-xs text-slate-500 mb-2 block">Color</label>
                 <div className="flex gap-2">
