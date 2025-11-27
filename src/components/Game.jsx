@@ -77,19 +77,23 @@ const Game = () => {
     const last30Start = new Date(todayStart);
     last30Start.setDate(last30Start.getDate() - 29); // includes today
 
-    const sumRange = (start, end) =>
+    const sumRange = (start, end, reducer) =>
       sessionList.reduce((sum, session) => {
         const played = new Date(session.played_at);
         if (start && played < start) return sum;
         if (end && played >= end) return sum;
-        return sum + repsFromSession(session);
+        return sum + reducer(session);
       }, 0);
 
     setStats({
-      today: sumRange(todayStart, null),
-      yesterday: sumRange(yesterdayStart, todayStart),
-      last7: sumRange(last7Start, null),
-      last30: sumRange(last30Start, null),
+      today: sumRange(todayStart, null, repsFromSession),
+      yesterday: sumRange(yesterdayStart, todayStart, repsFromSession),
+      last7: sumRange(last7Start, null, repsFromSession),
+      last30: sumRange(last30Start, null, repsFromSession),
+      kcalToday: sumRange(todayStart, null, (s) => s.calories_burned || 0),
+      kcalYesterday: sumRange(yesterdayStart, todayStart, (s) => s.calories_burned || 0),
+      kcal7: sumRange(last7Start, null, (s) => s.calories_burned || 0),
+      kcal30: sumRange(last30Start, null, (s) => s.calories_burned || 0),
       topToday: aggregateExercisesForRange(sessionList, todayStart, null),
       top7: aggregateExercisesForRange(sessionList, last7Start, null),
     });
@@ -309,24 +313,29 @@ const Game = () => {
                   <tr>
                     <th className="px-4 py-3">Window</th>
                     <th className="px-4 py-3 text-right">Reps</th>
+                    <th className="px-4 py-3 text-right">Kcal</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr className="border-t border-slate-800">
                     <td className="px-4 py-3 text-slate-300">Today</td>
                     <td className="px-4 py-3 text-right text-white font-semibold">{stats.today}</td>
+                    <td className="px-4 py-3 text-right text-orange-300 font-semibold">{Math.round(stats.kcalToday || 0)}</td>
                   </tr>
                   <tr className="border-t border-slate-800">
                     <td className="px-4 py-3 text-slate-300">Yesterday</td>
                     <td className="px-4 py-3 text-right text-white font-semibold">{stats.yesterday}</td>
+                    <td className="px-4 py-3 text-right text-orange-300 font-semibold">{Math.round(stats.kcalYesterday || 0)}</td>
                   </tr>
                   <tr className="border-t border-slate-800">
                     <td className="px-4 py-3 text-slate-300">Last 7 Days</td>
                     <td className="px-4 py-3 text-right text-white font-semibold">{stats.last7}</td>
+                    <td className="px-4 py-3 text-right text-orange-300 font-semibold">{Math.round(stats.kcal7 || 0)}</td>
                   </tr>
                   <tr className="border-t border-slate-800">
                     <td className="px-4 py-3 text-slate-300">Last 30 Days</td>
                     <td className="px-4 py-3 text-right text-white font-semibold">{stats.last30}</td>
+                    <td className="px-4 py-3 text-right text-orange-300 font-semibold">{Math.round(stats.kcal30 || 0)}</td>
                   </tr>
                 </tbody>
               </table>
@@ -360,6 +369,9 @@ const Game = () => {
                   <p className="text-xs text-slate-500">No reps logged last 7 days.</p>
                 )}
               </div>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2 text-xs text-orange-300">
+              <span className="flex items-center gap-1"><Flame size={12} /> Kcal shown per session in Recent Sessions below</span>
             </div>
           </div>
 
