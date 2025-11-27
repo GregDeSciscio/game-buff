@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
-import { Play, Pause, X, RotateCcw } from 'lucide-react';
+import { Play, Pause, X, RotateCcw, Flame } from 'lucide-react';
 import { calculateXP, getLevelProgress } from '../utilities/gameLogic';
 import BottomNav from './BottomNav';
 import { playClick, playTimerComplete } from '../utilities/sounds';
@@ -48,7 +48,9 @@ const GameBuffSession = ({ initialLoadout }) => {
   const [seconds, setSeconds] = useState(0);
   const [totalReps, setTotalReps] = useState(0);
   const [sessionXP, setSessionXP] = useState(0);
+  const [sessionCalories, setSessionCalories] = useState(0);
   const [userTotalXP, setUserTotalXP] = useState(0);
+  const [userWeightKg, setUserWeightKg] = useState(null);
   const [log, setLog] = useState([]);
   const [activeTimerTrigger, setActiveTimerTrigger] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -75,8 +77,11 @@ const GameBuffSession = ({ initialLoadout }) => {
     const fetchXP = async () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
-            const { data } = await supabase.from('profiles').select('total_xp').eq('id', user.id).single();
-            if (data) setUserTotalXP(data.total_xp);
+            const { data } = await supabase.from('profiles').select('total_xp, weight_kg').eq('id', user.id).single();
+            if (data) {
+              setUserTotalXP(data.total_xp);
+              setUserWeightKg(data.weight_kg || null);
+            }
         }
     };
     fetchXP();
@@ -107,9 +112,23 @@ const GameBuffSession = ({ initialLoadout }) => {
     }
   };
 
+  const estimateCalories = (trigger) => {
+    const weight = userWeightKg || 75;
+    if (trigger.type === 'timer') {
+      const seconds = trigger.amount || 0;
+      const met = 4; // moderate effort estimate
+      return met * weight * (seconds / 3600);
+    }
+    const reps = trigger.amount || 0;
+    const basePerRep = 0.5 * (weight / 75);
+    return reps * basePerRep;
+  };
+
   const logSuccess = (trigger) => {
     const gainedXP = calculateXP(trigger.exercise, trigger.amount, trigger.type);
+    const gainedCalories = estimateCalories(trigger);
     setSessionXP(prev => prev + gainedXP);
+    setSessionCalories(prev => prev + gainedCalories);
     setTotalReps(prev => prev + trigger.amount);
     const entry = {
       time: formatTime(seconds),
@@ -117,7 +136,8 @@ const GameBuffSession = ({ initialLoadout }) => {
       xp: gainedXP,
       amount: trigger.amount,
       type: trigger.type,
-      exercise: trigger.exercise
+      exercise: trigger.exercise,
+      calories: gainedCalories
     };
     setLog([entry, ...log]);
     setActiveTimerTrigger(null);
@@ -133,7 +153,8 @@ const GameBuffSession = ({ initialLoadout }) => {
         p_loadout_id: loadout.id, // Updated to use 'loadout.id'
         p_xp_gained: sessionXP,
         p_duration: seconds,
-        p_log: log
+        p_log: log,
+        p_calories: sessionCalories
       });
       if (error) throw error;
       navigate(`/game/${loadout.id}`, { state: { loadout } });
@@ -176,11 +197,17 @@ const GameBuffSession = ({ initialLoadout }) => {
             <div className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-white shadow-black drop-shadow-md">LEVEL {currentLevel} ({Math.floor(currentXP)} / {neededXP} XP)</div>
         </div>
         <div className="flex justify-between items-center mb-4">
-           <div className="flex flex-col"><span className="text-xs text-slate-400 uppercase">Total Reps</span><span className="text-3xl font-bold text-blue-400">{totalReps}</span></div>
+           <div className="flex flex-col">
+             <span className="text-xs text-slate-400 uppercase">Total Reps</span>
+             <span className="text-3xl font-bold text-blue-400">{totalReps}</span>
+             <span className="text-xs text-orange-300 flex items-center gap-1 mt-1">
+               <Flame size={12} /> ~{Math.round(sessionCalories)} kcal
+             </span>
+           </div>
            {hasTimerTriggers && (
              <button onClick={() => { playClick(); setIsActive(!isActive); }} className={`p-4 rounded-full ${isActive ? 'bg-yellow-600' : 'bg-green-600'}`}>{isActive ? <Pause size={24} /> : <Play size={24} />}</button>
-           )}
-        </div>
+            )}
+         </div>
         <button onClick={handleEndSession} disabled={isSaving} className="w-full py-3 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-300 text-sm font-semibold disabled:opacity-50">{isSaving ? "Saving..." : "End Session & Save"}</button>
       </div>
       <BottomNav />

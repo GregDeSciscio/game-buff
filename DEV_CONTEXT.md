@@ -35,10 +35,11 @@
 ## 4. Database Schema (Snapshot)
 - **profiles:** `id` (auth link), `username`, `display_name`, `total_xp`, `current_level`, `height_cm`, `weight_kg`
 - **loadouts:** `id`, `user_id`, `game_title`, `triggers` (JSONB Array), `visibility` (private/public/preset), `source_loadout_id`
-- **sessions:** `id`, `user_id`, `loadout_id`, `total_xp_gained`, `duration_seconds`, `log_summary` (JSONB)
+- **sessions:** `id`, `user_id`, `loadout_id`, `total_xp_gained`, `duration_seconds`, `calories_burned`, `log_summary` (JSONB)
 - **friends:** `id`, `requester_id`, `addressee_id`, `status` (pending/accepted/blocked), `created_at`
 
 ## 5. Changelog
+- **[Latest] Calories Estimate:** Sessions now track estimated calories; finish_session RPC/schema updated; seed data includes calories; UI shows kcal in sessions, history, and game recent sessions.
 - **[Latest] Seed Data Script:** Added `supabase_seed.sql` to insert sample users/profiles/loadouts/sessions/friends (requires real auth user IDs).
 - **[Latest] Explore Page:** Added `/explore` with Presets/Community tabs; bottom nav includes Explore link.
 - **Share & Attribution:** Visibility picker clarifies sharing; presets/community section shows attribution and copy badge.

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar, Trophy, Clock } from 'lucide-react';
+import { ArrowLeft, Calendar, Trophy, Clock, Flame } from 'lucide-react';
 import BottomNav from './BottomNav';
 
 const History = () => {
@@ -117,11 +117,18 @@ const History = () => {
                 </div>
                 </div>
                 
-                {/* Stats Row */}
-              <div className="flex gap-4 mt-3 pt-3 border-t border-slate-700/50 items-center justify-between">
-                <div className="flex items-center gap-2 text-xs text-slate-300">
-                  <Clock size={14} className="text-blue-400" /> 
-                  {Math.floor(session.duration_seconds / 60)}m {session.duration_seconds % 60}s
+              {/* Stats Row */}
+              <div className="flex gap-4 mt-3 pt-3 border-t border-slate-700/50 items-center justify-between flex-wrap">
+                <div className="flex items-center gap-3 text-xs text-slate-300">
+                  <span className="flex items-center gap-1">
+                    <Clock size={14} className="text-blue-400" /> 
+                    {Math.floor(session.duration_seconds / 60)}m {session.duration_seconds % 60}s
+                  </span>
+                  {session.calories_burned !== null && session.calories_burned !== undefined && (
+                    <span className="flex items-center gap-1 text-orange-300">
+                      <Flame size={14} /> ~{Math.round(session.calories_burned)} kcal
+                    </span>
+                  )}
                 </div>
                 <button
                   onClick={() => handleDelete(session)}

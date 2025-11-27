@@ -3,11 +3,11 @@
 --   psql "<your_supabase_connection_string>" -f supabase_seed.sql
 --
 -- Replace these UUIDs with real auth.user IDs from Supabase Auth
-\set u1 '11111111-1111-1111-1111-111111111111'
-\set u2 '22222222-2222-2222-2222-222222222222'
-\set u3 '33333333-3333-3333-3333-333333333333'
+\set u1 '57e586fb-eac2-44d0-a992-76501cf11880'
+\set u2 'a481b09d-a959-444d-a80e-91b8782ce2f8'
+\set u3 'd8ce0f92-9020-412f-a7ba-53dda9f28f93'
 -- Optional service/preset owner (can be a service account or one of the above)
-\set preset_owner '00000000-0000-0000-0000-000000000000'
+\set preset_owner '15333378-d0d0-436c-a841-d898d219ac9b'
 
 -- Profiles
 insert into profiles (id, username, display_name, total_xp, current_level)
@@ -33,14 +33,14 @@ values
 on conflict do nothing;
 
 -- Sessions (simple history)
-insert into sessions (user_id, loadout_id, total_xp_gained, duration_seconds, log_summary)
-select :u1, id, 300, 1800, '[{"message":"+150 XP (Pushups)","xp":150,"type":"reps","amount":15,"exercise":"Pushups"}]'::jsonb
+insert into sessions (user_id, loadout_id, total_xp_gained, duration_seconds, calories_burned, log_summary)
+select :u1, id, 300, 1800, 120, '[{"message":"+150 XP (Pushups)","xp":150,"type":"reps","amount":15,"exercise":"Pushups","calories":60}]'::jsonb
 from loadouts where user_id = :u1
 union all
-select :u2, id, 220, 1500, '[{"message":"+120 XP (Squats)","xp":120,"type":"reps","amount":12,"exercise":"Squats"}]'::jsonb
+select :u2, id, 220, 1500, 95, '[{"message":"+120 XP (Squats)","xp":120,"type":"reps","amount":12,"exercise":"Squats","calories":50}]'::jsonb
 from loadouts where user_id = :u2
 union all
-select :u3, id, 180, 1200, '[{"message":"+100 XP (Jumping Jacks)","xp":100,"type":"reps","amount":20,"exercise":"Jumping Jacks"}]'::jsonb
+select :u3, id, 180, 1200, 80, '[{"message":"+100 XP (Jumping Jacks)","xp":100,"type":"reps","amount":20,"exercise":"Jumping Jacks","calories":40}]'::jsonb
 from loadouts where user_id = :u3
 on conflict do nothing;
 

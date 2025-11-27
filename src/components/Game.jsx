@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import { ArrowLeft, Play, History as HistoryIcon, BarChart2, Trash2 } from 'lucide-react';
+import { ArrowLeft, Play, History as HistoryIcon, BarChart2, Trash2, Flame } from 'lucide-react';
 import BottomNav from './BottomNav';
 
 const Game = () => {
@@ -430,17 +430,22 @@ const Game = () => {
                           )}
                         </div>
                       </div>
-                      <div className="text-right text-xs text-slate-400 flex flex-col items-end gap-2">
-                        <div className="text-right">
-                          <span className="block">
-                            {Math.floor(session.duration_seconds / 60)}m {session.duration_seconds % 60}s
+                    <div className="text-right text-xs text-slate-400 flex flex-col items-end gap-2">
+                      <div className="text-right">
+                        <span className="block">
+                          {Math.floor(session.duration_seconds / 60)}m {session.duration_seconds % 60}s
+                        </span>
+                        <span className="block">{repsFromSession(session)} reps</span>
+                        {session.calories_burned !== null && session.calories_burned !== undefined && (
+                          <span className="block text-orange-300 flex items-center gap-1 justify-end">
+                            <Flame size={12} /> ~{Math.round(session.calories_burned)} kcal
                           </span>
-                          <span className="block">{repsFromSession(session)} reps</span>
-                        </div>
-                        <button
-                          onClick={() => handleDelete(session)}
-                          disabled={deletingId === session.id}
-                          className="inline-flex items-center gap-1 text-xs px-3 py-2 rounded-lg border border-red-500 text-red-300 hover:bg-red-500 hover:text-white transition disabled:opacity-50"
+                        )}
+                      </div>
+                      <button
+                        onClick={() => handleDelete(session)}
+                        disabled={deletingId === session.id}
+                        className="inline-flex items-center gap-1 text-xs px-3 py-2 rounded-lg border border-red-500 text-red-300 hover:bg-red-500 hover:text-white transition disabled:opacity-50"
                           title="Deletes the session and removes the XP gained"
                         >
                           <Trash2 size={14} />

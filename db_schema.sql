@@ -36,6 +36,7 @@ create table sessions (
   loadout_id uuid references loadouts(id),
   total_xp_gained int default 0,
   duration_seconds int default 0,
+  calories_burned numeric default 0,
   log_summary jsonb,
   played_at timestamp with time zone default timezone('utc'::text, now())
 );
@@ -71,10 +72,10 @@ create policy "Users can request friends" on friends for insert with check (auth
 create policy "Users can update their friendships" on friends for update using (auth.uid() = requester_id or auth.uid() = addressee_id);
 
 -- FUNCTIONS & TRIGGERS --
-create or replace function finish_session(p_loadout_id uuid, p_xp_gained int, p_duration int, p_log jsonb) returns void as $$
+create or replace function finish_session(p_loadout_id uuid, p_xp_gained int, p_duration int, p_log jsonb, p_calories numeric default 0) returns void as $$
 begin
-  insert into sessions (user_id, loadout_id, total_xp_gained, duration_seconds, log_summary)
-  values (auth.uid(), p_loadout_id, p_xp_gained, p_duration, p_log);
+  insert into sessions (user_id, loadout_id, total_xp_gained, duration_seconds, calories_burned, log_summary)
+  values (auth.uid(), p_loadout_id, p_xp_gained, p_duration, coalesce(p_calories,0), p_log);
   update profiles set total_xp = total_xp + p_xp_gained where id = auth.uid();
 end;
 $$ language plpgsql security definer;
