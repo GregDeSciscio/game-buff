@@ -39,7 +39,7 @@
 - **friends:** `id`, `requester_id`, `addressee_id`, `status` (pending/accepted/blocked), `created_at`
 
 ## 5. Changelog
-- **[Latest] Delete Loadout:** Edit screen now has a delete button with confirmation for removing a game/loadout.
+- **[Latest] Delete Loadout:** Edit screen has a delete button (now visible above bottom nav) with confirmation for removing a game/loadout.
 - **Nav Icon Update:** Games tab now uses a gamepad icon in the global bottom nav.
 - **Friends UX:** Added `/friends` screen for requests, sent, friends, and add-by-search; dashboard link.
 - **Display Name + Leaderboards:** Profiles now support public `display_name`; leaderboards show display names (fallback to username).

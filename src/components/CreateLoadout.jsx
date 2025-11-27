@@ -128,7 +128,7 @@ const CreateLoadout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 p-4 pb-32 font-sans safe-area-pb">
+    <div className="min-h-screen bg-slate-900 text-slate-100 p-4 pb-40 font-sans safe-area-pb">
       
       {/* Header */}
       <div className="mb-8 flex items-center gap-3">
@@ -180,7 +180,7 @@ const CreateLoadout = () => {
         <button onClick={addTrigger} className="w-full py-3 border-2 border-dashed border-slate-700 text-slate-400 rounded-xl flex items-center justify-center gap-2 hover:bg-slate-800 hover:text-white transition-colors"><Plus size={18} /> Add Trigger</button>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-slate-900/90 backdrop-blur border-t border-slate-800 safe-area-pb">
+      <div className="fixed left-0 right-0 bottom-16 p-4 bg-slate-900/90 backdrop-blur border-t border-slate-800 safe-area-pb">
         <div className="flex items-center gap-3">
           {id && (
             <button
