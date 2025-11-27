@@ -39,7 +39,7 @@
 - **friends:** `id`, `requester_id`, `addressee_id`, `status` (pending/accepted/blocked), `created_at`
 
 ## 5. Changelog
-- **[Latest] Global Bottom Nav:** Added reusable bottom nav (Games/History/Leaderboards/Friends) across all screens.
+- **[Latest] Nav Icon Update:** Games tab now uses a gamepad icon in the global bottom nav.
 - **Friends UX:** Added `/friends` screen for requests, sent, friends, and add-by-search; dashboard link.
 - **Display Name + Leaderboards:** Profiles now support public `display_name`; leaderboards show display names (fallback to username).
 - **Leaderboards (Global/Friends) + Friends Schema:** Added friends table + RLS, new `/leaderboard` screen with global and friends tabs, dashboard link.

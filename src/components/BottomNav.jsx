@@ -1,9 +1,9 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Eye, History, Trophy, Users } from 'lucide-react';
+import { Gamepad2, History, Trophy, Users } from 'lucide-react';
 
 const navItems = [
-  { id: 'games', label: 'Games', icon: Eye, path: '/dashboard', match: ['/dashboard', '/game', '/edit', '/create'] },
+  { id: 'games', label: 'Games', icon: Gamepad2, path: '/dashboard', match: ['/dashboard', '/game', '/edit', '/create'] },
   { id: 'history', label: 'History', icon: History, path: '/history', match: ['/history'] },
   { id: 'leaders', label: 'Leaders', icon: Trophy, path: '/leaderboard', match: ['/leaderboard'] },
   { id: 'friends', label: 'Friends', icon: Users, path: '/friends', match: ['/friends'] },
