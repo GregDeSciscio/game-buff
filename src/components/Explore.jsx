@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import { Search, Sparkles, Globe2, Loader2 } from 'lucide-react';
+import { Search, Sparkles, Globe2, Loader2, ChevronDown } from 'lucide-react';
 import BottomNav from './BottomNav';
 
 const Explore = () => {
@@ -12,6 +12,7 @@ const Explore = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [copyingId, setCopyingId] = useState(null);
+  const [expandedId, setExpandedId] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -70,21 +71,43 @@ const Explore = () => {
     return (
       <div className="space-y-3">
         {items.map((item) => (
-          <div key={item.id} className="bg-slate-800 border border-slate-700 rounded-lg p-3 flex justify-between items-center">
-            <div>
-              <p className="text-white font-semibold">{item.game_title}</p>
-              <p className="text-xs text-slate-500">
-                {type === 'preset' ? 'Preset' : 'Community'} · {item.triggers?.length || 0} triggers
-                {type === 'community' && <> · {item.profiles?.display_name || item.profiles?.username || 'Player'}</>}
-              </p>
+          <div key={item.id} className="bg-slate-800 border border-slate-700 rounded-lg p-3">
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-white font-semibold">{item.game_title}</p>
+                <p className="text-xs text-slate-500">
+                  {type === 'preset' ? 'Preset' : 'Community'} · {item.triggers?.length || 0} triggers
+                  {type === 'community' && <> · {item.profiles?.display_name || item.profiles?.username || 'Player'}</>}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                {item.triggers?.length ? (
+                  <button
+                    onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
+                    className="text-xs px-3 py-2 rounded-lg border border-slate-600 text-slate-200 hover:bg-slate-700 flex items-center gap-1"
+                  >
+                    <ChevronDown size={12} className={`${expandedId === item.id ? 'rotate-180' : ''} transition`} /> View
+                  </button>
+                ) : null}
+                <button
+                  onClick={() => copyLoadout(item)}
+                  disabled={copyingId === item.id}
+                  className="text-xs px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-500 disabled:opacity-50"
+                >
+                  {copyingId === item.id ? 'Copying...' : 'Use'}
+                </button>
+              </div>
             </div>
-            <button
-              onClick={() => copyLoadout(item)}
-              disabled={copyingId === item.id}
-              className="text-xs px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-500 disabled:opacity-50"
-            >
-              {copyingId === item.id ? 'Copying...' : 'Use'}
-            </button>
+            {expandedId === item.id && item.triggers?.length ? (
+              <div className="mt-3 space-y-2 border-t border-slate-700 pt-3">
+                {item.triggers.map((t, idx) => (
+                  <div key={idx} className="flex justify-between text-xs text-slate-200 bg-slate-900/60 rounded px-2 py-1">
+                    <span>{t.label || 'Trigger'}</span>
+                    <span className="text-slate-400">{t.amount}{t.type === 'timer' ? 's' : ' reps'} {t.exercise}</span>
+                  </div>
+                ))}
+              </div>
+            ) : null}
           </div>
         ))}
       </div>
