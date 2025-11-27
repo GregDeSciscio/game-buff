@@ -225,7 +225,7 @@ const Game = () => {
 
     const { data: sessionData } = await supabase
       .from('sessions')
-      .select('id, total_xp_gained, duration_seconds, log_summary, played_at')
+      .select('id, total_xp_gained, duration_seconds, calories_burned, log_summary, played_at')
       .eq('user_id', user.id)
       .eq('loadout_id', id)
       .order('played_at', { ascending: false })
