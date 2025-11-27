@@ -103,7 +103,8 @@ const CreateLoadout = () => {
       const { error: updateError } = await supabase
         .from('loadouts')
         .update(payload)
-        .eq('id', id);
+        .eq('id', id)
+        .eq('user_id', user.id);
       error = updateError;
     } else {
       // CREATE NEW
@@ -114,8 +115,8 @@ const CreateLoadout = () => {
     }
 
     if (error) {
-        console.error(error);
-        alert('Error saving loadout');
+        console.error('Save loadout failed', error);
+        alert(`Error saving loadout: ${error.message || 'Unknown error'}`);
         setLoading(false);
     } else {
         navigate('/dashboard');
