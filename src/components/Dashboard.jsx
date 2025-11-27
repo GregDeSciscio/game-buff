@@ -152,6 +152,14 @@ const Dashboard = () => {
       <div className="fixed bottom-0 left-0 right-0 bg-slate-900/95 border-t border-slate-800 backdrop-blur px-6 py-3 safe-area-pb">
         <div className="flex items-center justify-around text-slate-400 text-sm">
           <button
+            onClick={() => navigate('/dashboard')}
+            className="flex flex-col items-center gap-1 hover:text-white transition"
+            title="Games"
+          >
+            <Eye size={20} />
+            <span className="text-[12px]">Games</span>
+          </button>
+          <button
             onClick={() => navigate('/history')}
             className="flex flex-col items-center gap-1 hover:text-white transition"
             title="History"

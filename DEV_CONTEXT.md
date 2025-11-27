@@ -39,7 +39,7 @@
 - **friends:** `id`, `requester_id`, `addressee_id`, `status` (pending/accepted/blocked), `created_at`
 
 ## 5. Changelog
-- **[Latest] Nav Update:** Account/Friends/Logout remain top-right; History and Leaderboards moved to bottom nav on Dashboard.
+- **[Latest] Nav Update:** Account/Friends/Logout remain top-right; Games/History/Leaderboards now in bottom nav on Dashboard.
 - **Friends UX:** Added `/friends` screen for requests, sent, friends, and add-by-search; dashboard link.
 - **Display Name + Leaderboards:** Profiles now support public `display_name`; leaderboards show display names (fallback to username).
 - **Leaderboards (Global/Friends) + Friends Schema:** Added friends table + RLS, new `/leaderboard` screen with global and friends tabs, dashboard link.
