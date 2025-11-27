@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import { Plus, Play, Trophy, LogOut, Pencil, User, Users, Eye } from 'lucide-react'; // Added Pencil
+import { Plus, Play, Trophy, LogOut, Pencil, User, Users, Eye, Globe2, Lock, Sparkles } from 'lucide-react'; // Added Pencil
 import { getLevelProgress } from '../utilities/gameLogic';
 import BottomNav from './BottomNav';
 
@@ -102,7 +102,24 @@ const Dashboard = () => {
           <div key={loadout.id} className="bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-between items-center group hover:border-blue-500 transition-colors">
             <div>
               <h3 className="font-bold text-white text-lg">{loadout.game_title}</h3>
-              <p className="text-slate-400 text-xs">{loadout.triggers.length} Triggers defined</p>
+              <div className="flex items-center gap-2 text-slate-400 text-xs mt-1">
+                <span>{loadout.triggers.length} Triggers</span>
+                {loadout.visibility === 'public' && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-500/10 text-green-300 border border-green-500/30">
+                    <Globe2 size={12} /> Public
+                  </span>
+                )}
+                {loadout.visibility === 'preset' && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-purple-500/10 text-purple-200 border border-purple-500/30">
+                    <Sparkles size={12} /> Preset
+                  </span>
+                )}
+                {(!loadout.visibility || loadout.visibility === 'private') && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-slate-700 text-slate-300 border border-slate-600">
+                    <Lock size={12} /> Private
+                  </span>
+                )}
+              </div>
             </div>
             
             <div className="flex gap-3">

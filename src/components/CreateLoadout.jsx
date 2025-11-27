@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Plus, Trash2, Save, Gamepad2, ArrowLeft } from 'lucide-react';
+import { Plus, Trash2, Save, Gamepad2, ArrowLeft, Share2 } from 'lucide-react';
 import BottomNav from './BottomNav';
 
 const CreateLoadout = () => {
@@ -14,7 +14,7 @@ const CreateLoadout = () => {
   const [presets, setPresets] = useState([]);
   const [community, setCommunity] = useState([]);
   const [loadingPresets, setLoadingPresets] = useState(false);
-  
+
   const [gameTitle, setGameTitle] = useState('');
   const [triggers, setTriggers] = useState([
     { id: 1, label: '', exercise: 'Pushups', amount: 10, type: 'reps', color: 'bg-red-600' }
@@ -60,7 +60,7 @@ const CreateLoadout = () => {
 
   const addTrigger = () => {
     // Use Date.now() for unique temp IDs during editing to prevent key conflicts
-    const newId = Date.now(); 
+    const newId = Date.now();
     setTriggers([...triggers, { id: newId, label: '', exercise: 'Pushups', amount: 10, type: 'reps', color: 'bg-slate-600' }]);
   };
 
@@ -87,7 +87,7 @@ const CreateLoadout = () => {
     setLoading(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    
+
     const payload = {
       user_id: user.id,
       game_title: gameTitle,
@@ -95,7 +95,7 @@ const CreateLoadout = () => {
       visibility,
       source_loadout_id: sourceLoadoutId,
     };
-    
+
     let error;
 
     if (id) {
@@ -112,7 +112,7 @@ const CreateLoadout = () => {
         .insert([payload]);
       error = insertError;
     }
-    
+
     if (error) {
         console.error(error);
         alert('Error saving loadout');
@@ -174,7 +174,7 @@ const CreateLoadout = () => {
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 p-4 pb-40 font-sans safe-area-pb">
-      
+
       {/* Header */}
       <div className="mb-8 flex items-center gap-3">
         <button onClick={() => navigate('/dashboard')} className="p-2 bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
@@ -190,7 +190,7 @@ const CreateLoadout = () => {
         <input type="text" value={gameTitle} onChange={(e) => setGameTitle(e.target.value)} placeholder="e.g. Call of Duty" className="w-full bg-slate-800 border border-slate-700 text-white rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all" />
       </div>
 
-      <div className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-3">
         <div className="bg-slate-800 border border-slate-700 rounded-xl p-3">
           <label className="block text-xs uppercase tracking-wider text-slate-400 mb-2">Visibility</label>
           <div className="flex gap-2">
@@ -204,10 +204,13 @@ const CreateLoadout = () => {
               </button>
             ))}
           </div>
-          <p className="text-[11px] text-slate-500 mt-2">Public loadouts appear in Community and can be copied by others.</p>
+          <p className="text-[11px] text-slate-500 mt-2 flex items-start gap-2">
+            <Share2 size={12} className="mt-0.5 text-blue-400" />
+            Public loadouts appear in Community and can be copied by others. Private stays yours.
+          </p>
         </div>
 
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-3">
+        <div className="bg-slate-800 border border-slate-700 rounded-xl p-3 md:col-span-2">
           <div className="flex justify-between items-center mb-2">
             <span className="text-xs uppercase tracking-wider text-slate-400">Presets & Community</span>
             <div className="flex gap-2">
@@ -223,7 +226,7 @@ const CreateLoadout = () => {
                 <div key={p.id} className="flex items-center justify-between bg-slate-900/60 border border-slate-800 rounded-lg px-3 py-2">
                   <div>
                     <p className="text-white font-semibold">{p.game_title}</p>
-                    <p className="text-[11px] text-slate-500">Preset • {p.triggers.length} triggers</p>
+                    <p className="text-[11px] text-slate-500">Preset · {p.triggers.length} triggers</p>
                   </div>
                   <button onClick={() => applyLoadout(p)} className="text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-500">Use</button>
                 </div>
@@ -232,7 +235,10 @@ const CreateLoadout = () => {
                 <div key={p.id} className="flex items-center justify-between bg-slate-900/60 border border-slate-800 rounded-lg px-3 py-2">
                   <div>
                     <p className="text-white font-semibold">{p.game_title}</p>
-                    <p className="text-[11px] text-slate-500">Community • {p.triggers.length} triggers • {p.profiles?.display_name || p.profiles?.username || 'Player'}</p>
+                    <p className="text-[11px] text-slate-500">
+                      Community · {p.triggers.length} triggers · {p.profiles?.display_name || p.profiles?.username || 'Player'}
+                      {p.source_loadout_id && <span> · Copy</span>}
+                    </p>
                   </div>
                   <button onClick={() => applyLoadout(p)} className="text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-500">Use</button>
                 </div>

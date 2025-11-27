@@ -39,7 +39,9 @@
 - **friends:** `id`, `requester_id`, `addressee_id`, `status` (pending/accepted/blocked), `created_at`
 
 ## 5. Changelog
-- **[Latest] Presets & Community Loadouts:** Added loadout visibility/public share; presets/community picker in Create/Edit; `visibility` and `source_loadout_id` columns added with public/preset select policy.
+- **[Latest] Share & Attribution:** Visibility picker clarifies sharing; presets/community section shows attribution and copy badge.
+- **Loadout Visibility Badges:** Dashboard shows Private/Public/Preset badges for each loadout.
+- **Presets & Community Loadouts:** Added loadout visibility/public share; presets/community picker in Create/Edit; `visibility` and `source_loadout_id` columns added with public/preset select policy.
 - **Delete Loadout:** Edit screen has a delete button (now visible above bottom nav) with confirmation for removing a game/loadout.
 - **Nav Icon Update:** Games tab now uses a gamepad icon in the global bottom nav.
 - **Friends UX:** Added `/friends` screen for requests, sent, friends, and add-by-search; dashboard link.
