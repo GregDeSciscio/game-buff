@@ -12,6 +12,7 @@ import Game from './components/Game';
 import Profile from './components/Profile';
 import Leaderboard from './components/Leaderboard';
 import Friends from './components/Friends';
+import Explore from './components/Explore';
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
@@ -113,6 +114,12 @@ const App = () => {
         <Route path="/friends" element={
           <ProtectedRoute>
             <Friends />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/explore" element={
+          <ProtectedRoute>
+            <Explore />
           </ProtectedRoute>
         } />
 
