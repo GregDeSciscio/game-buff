@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Play, Pause, X, RotateCcw, Flame } from 'lucide-react';
 import { calculateXP, getLevelProgress } from '../utilities/gameLogic';
 import { calculateCalories } from '../utilities/calories';
+import { getExerciseMedia } from '../utilities/exerciseMedia';
 import BottomNav from './BottomNav';
 import { playClick, playTimerComplete } from '../utilities/sounds';
 
@@ -55,6 +56,7 @@ const GameBuffSession = ({ initialLoadout }) => {
   const [log, setLog] = useState([]);
   const [activeTimerTrigger, setActiveTimerTrigger] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [showMedia, setShowMedia] = useState(true);
   const hasTimerTriggers = loadout?.triggers?.some((t) => t.type === 'timer');
 
   // 1. NEW: Fetch the latest version of this loadout immediately
@@ -167,6 +169,14 @@ const GameBuffSession = ({ initialLoadout }) => {
         <div><h2 className="text-xs text-slate-400 uppercase tracking-widest">Current Game</h2><h1 className="text-xl font-bold text-white">{loadout.game_title}</h1></div>
         <div className={`text-2xl font-mono font-bold ${isActive ? 'text-green-400' : 'text-slate-500'}`}>{formatTime(seconds)}</div>
       </div>
+      <div className="flex justify-end px-4 pt-2">
+        <button
+          onClick={() => setShowMedia(!showMedia)}
+          className="text-[11px] text-slate-400 hover:text-white px-3 py-1 border border-slate-700 rounded-full"
+        >
+          {showMedia ? 'Hide animations' : 'Show animations'}
+        </button>
+      </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {/* Updated to map over 'loadout.triggers' instead of 'initialLoadout' */}
@@ -174,6 +184,15 @@ const GameBuffSession = ({ initialLoadout }) => {
           <button key={idx} onClick={() => handleTrigger(trigger)} className={`w-full py-8 rounded-xl shadow-lg transform transition active:scale-95 flex flex-col items-center justify-center ${trigger.color}`}>
             <span className="text-2xl font-black uppercase tracking-wider text-white drop-shadow-md">{trigger.label}</span>
             <span className="text-sm font-medium text-white/90 mt-1 bg-black/20 px-3 py-1 rounded-full">+{trigger.amount} {trigger.exercise}</span>
+            {showMedia && getExerciseMedia(trigger.exercise) && (
+              <span className="mt-2 inline-flex items-center gap-2 text-xs text-slate-200">
+                <span className="relative w-8 h-8 rounded-full overflow-hidden border border-white/10">
+                  <span className="absolute inset-0 bg-gradient-to-br from-emerald-400/70 via-sky-400/70 to-purple-500/70 animate-[spin_3s_linear_infinite] opacity-70" />
+                  <span className="absolute inset-1 bg-slate-900/70 rounded-full" />
+                </span>
+                Animated cue
+              </span>
+            )}
           </button>
         ))}
       </div>
