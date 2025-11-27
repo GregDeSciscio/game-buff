@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import { Plus, Play, Trophy, LogOut, History, Pencil, Eye, User, Trophy as TrophyIcon, Users } from 'lucide-react'; // Added Pencil
+import { Plus, Play, Trophy, LogOut, Pencil, User, Users } from 'lucide-react'; // Added Pencil
 import { getLevelProgress } from '../utilities/gameLogic';
+import BottomNav from './BottomNav';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -148,35 +149,7 @@ const Dashboard = () => {
         </button>
       </div>
 
-      {/* Bottom nav */}
-      <div className="fixed bottom-0 left-0 right-0 bg-slate-900/95 border-t border-slate-800 backdrop-blur px-6 py-3 safe-area-pb">
-        <div className="flex items-center justify-around text-slate-400 text-sm">
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="flex flex-col items-center gap-1 hover:text-white transition"
-            title="Games"
-          >
-            <Eye size={20} />
-            <span className="text-[12px]">Games</span>
-          </button>
-          <button
-            onClick={() => navigate('/history')}
-            className="flex flex-col items-center gap-1 hover:text-white transition"
-            title="History"
-          >
-            <History size={20} />
-            <span className="text-[12px]">History</span>
-          </button>
-          <button
-            onClick={() => navigate('/leaderboard')}
-            className="flex flex-col items-center gap-1 hover:text-white transition"
-            title="Leaderboards"
-          >
-            <TrophyIcon size={20} />
-            <span className="text-[12px]">Leaders</span>
-          </button>
-        </div>
-      </div>
+      <BottomNav />
 
     </div>
   );

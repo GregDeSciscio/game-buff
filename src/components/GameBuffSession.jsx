@@ -3,6 +3,7 @@ import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import { Play, Pause, X, RotateCcw } from 'lucide-react';
 import { calculateXP, getLevelProgress } from '../utilities/gameLogic';
+import BottomNav from './BottomNav';
 import { playClick, playTimerComplete } from '../utilities/sounds';
 
 const TimerModal = ({ trigger, onComplete, onCancel }) => {
@@ -147,7 +148,7 @@ const GameBuffSession = ({ initialLoadout }) => {
   const { currentLevel, progressPercent, neededXP, currentXP } = getLevelProgress(userTotalXP + sessionXP);
 
   return (
-    <div className="flex flex-col h-screen bg-slate-900 text-slate-100 font-sans">
+    <div className="flex flex-col h-screen bg-slate-900 text-slate-100 font-sans pb-32">
       {hasTimerTriggers && activeTimerTrigger && (
         <TimerModal trigger={activeTimerTrigger} onComplete={logSuccess} onCancel={() => setActiveTimerTrigger(null)} />
       )}
@@ -182,6 +183,7 @@ const GameBuffSession = ({ initialLoadout }) => {
         </div>
         <button onClick={handleEndSession} disabled={isSaving} className="w-full py-3 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-300 text-sm font-semibold disabled:opacity-50">{isSaving ? "Saving..." : "End Session & Save"}</button>
       </div>
+      <BottomNav />
     </div>
   );
 };

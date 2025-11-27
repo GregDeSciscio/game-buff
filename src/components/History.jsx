@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, Trophy, Clock } from 'lucide-react';
+import BottomNav from './BottomNav';
 
 const History = () => {
   const navigate = useNavigate();
@@ -81,7 +82,7 @@ const History = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 p-4 font-sans safe-area-pb">
+    <div className="min-h-screen bg-slate-900 text-slate-100 p-4 font-sans pb-32 safe-area-pb">
       
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
@@ -135,6 +136,7 @@ const History = () => {
             ))}
           </div>
       )}
+      <BottomNav />
     </div>
   );
 };

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Plus, Trash2, Save, Gamepad2, ArrowLeft } from 'lucide-react';
+import BottomNav from './BottomNav';
 
 const CreateLoadout = () => {
   const navigate = useNavigate();
@@ -110,7 +111,7 @@ const CreateLoadout = () => {
   if (loading && id && !gameTitle) return <div className="min-h-screen bg-slate-900 flex items-center justify-center text-white">Loading Loadout...</div>;
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 p-4 pb-24 font-sans safe-area-pb">
+    <div className="min-h-screen bg-slate-900 text-slate-100 p-4 pb-32 font-sans safe-area-pb">
       
       {/* Header */}
       <div className="mb-8 flex items-center gap-3">
@@ -167,6 +168,7 @@ const CreateLoadout = () => {
            {loading ? 'Saving...' : <><Save size={18} /> {id ? 'Update Loadout' : 'Save Loadout'}</>}
         </button>
       </div>
+      <BottomNav />
     </div>
   );
 };

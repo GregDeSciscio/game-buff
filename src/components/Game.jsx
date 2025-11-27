@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { ArrowLeft, Play, History as HistoryIcon, BarChart2, Trash2 } from 'lucide-react';
+import BottomNav from './BottomNav';
 
 const Game = () => {
   const { id } = useParams();
@@ -247,7 +248,7 @@ const Game = () => {
   const recentSessions = filteredSessions.slice(0, 5);
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 p-4 font-sans safe-area-pb">
+    <div className="min-h-screen bg-slate-900 text-slate-100 p-4 font-sans pb-32 safe-area-pb">
       <div className="flex items-center gap-3 mb-6">
         <button
           onClick={() => navigate('/dashboard')}
@@ -454,6 +455,7 @@ const Game = () => {
           </div>
         </>
       )}
+      <BottomNav />
     </div>
   );
 };
