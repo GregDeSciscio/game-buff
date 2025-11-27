@@ -52,6 +52,23 @@ values
   (:u2, :u3, 'accepted')
 on conflict do nothing;
 
+-- Streaks (seeded)
+insert into streaks (user_id, current_streak, longest_streak, last_session_date)
+values
+  (:u1, 2, 3, timezone('utc'::text, now())::date),
+  (:u2, 1, 2, timezone('utc'::text, now())::date),
+  (:u3, 0, 1, (timezone('utc'::text, now()) - interval '2 days')::date)
+on conflict (user_id) do nothing;
+
+-- Badges (seeded)
+insert into badges (user_id, badge_key)
+values
+  (:u1, 'sessions_10'),
+  (:u1, 'streak_7'),
+  (:u2, 'sessions_10'),
+  (:u3, 'sessions_10')
+on conflict do nothing;
+
 -- Make sure public/preset policy exists
 drop policy if exists "Anyone can see public/preset loadouts" on loadouts;
 create policy "Anyone can see public/preset loadouts"
