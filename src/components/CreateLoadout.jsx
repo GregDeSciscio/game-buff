@@ -9,6 +9,11 @@ const CreateLoadout = () => {
   const { id } = useParams(); // Capture ID from URL to check if we are editing
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [visibility, setVisibility] = useState('private');
+  const [sourceLoadoutId, setSourceLoadoutId] = useState(null);
+  const [presets, setPresets] = useState([]);
+  const [community, setCommunity] = useState([]);
+  const [loadingPresets, setLoadingPresets] = useState(false);
   
   const [gameTitle, setGameTitle] = useState('');
   const [triggers, setTriggers] = useState([
@@ -37,6 +42,8 @@ const CreateLoadout = () => {
       setGameTitle(data.game_title);
       // Ensure triggers are set correctly from JSONB
       setTriggers(data.triggers);
+      setVisibility(data.visibility || 'private');
+      setSourceLoadoutId(data.source_loadout_id || null);
     }
     setLoading(false);
   };
@@ -81,7 +88,13 @@ const CreateLoadout = () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     
-    const payload = { user_id: user.id, game_title: gameTitle, triggers: triggers };
+    const payload = {
+      user_id: user.id,
+      game_title: gameTitle,
+      triggers: triggers,
+      visibility,
+      source_loadout_id: sourceLoadoutId,
+    };
     
     let error;
 
@@ -127,6 +140,38 @@ const CreateLoadout = () => {
     navigate('/dashboard');
   };
 
+  const fetchPresets = async () => {
+    setLoadingPresets(true);
+    const title = gameTitle.trim();
+    const filters = title ? { column: 'game_title', value: title } : null;
+    let query = supabase.from('loadouts').select('*').eq('visibility', 'preset').limit(10);
+    if (filters) query = query.eq(filters.column, filters.value);
+    const { data } = await query;
+    setPresets(data || []);
+    setLoadingPresets(false);
+  };
+
+  const fetchCommunity = async () => {
+    setLoadingPresets(true);
+    const title = gameTitle.trim();
+    const { data } = await supabase
+      .from('loadouts')
+      .select('*, profiles(display_name, username)')
+      .eq('visibility', 'public')
+      .ilike('game_title', title ? title : '%')
+      .order('created_at', { ascending: false })
+      .limit(10);
+    setCommunity(data || []);
+    setLoadingPresets(false);
+  };
+
+  const applyLoadout = (loadout) => {
+    setGameTitle(loadout.game_title);
+    setTriggers(loadout.triggers);
+    setSourceLoadoutId(loadout.id);
+    setVisibility('private');
+  };
+
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 p-4 pb-40 font-sans safe-area-pb">
       
@@ -143,6 +188,59 @@ const CreateLoadout = () => {
       <div className="mb-6">
         <label className="block text-xs uppercase tracking-wider text-slate-400 mb-2">Game Name</label>
         <input type="text" value={gameTitle} onChange={(e) => setGameTitle(e.target.value)} placeholder="e.g. Call of Duty" className="w-full bg-slate-800 border border-slate-700 text-white rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all" />
+      </div>
+
+      <div className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="bg-slate-800 border border-slate-700 rounded-xl p-3">
+          <label className="block text-xs uppercase tracking-wider text-slate-400 mb-2">Visibility</label>
+          <div className="flex gap-2">
+            {['private', 'public'].map((option) => (
+              <button
+                key={option}
+                onClick={() => setVisibility(option)}
+                className={`flex-1 py-2 rounded-lg border ${visibility === option ? 'border-blue-500 text-white' : 'border-slate-700 text-slate-400'}`}
+              >
+                {option === 'private' ? 'Private' : 'Share with Community'}
+              </button>
+            ))}
+          </div>
+          <p className="text-[11px] text-slate-500 mt-2">Public loadouts appear in Community and can be copied by others.</p>
+        </div>
+
+        <div className="bg-slate-800 border border-slate-700 rounded-xl p-3">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-xs uppercase tracking-wider text-slate-400">Presets & Community</span>
+            <div className="flex gap-2">
+              <button onClick={fetchPresets} className="text-xs px-2 py-1 rounded bg-slate-700 hover:bg-slate-600 text-white">Presets</button>
+              <button onClick={fetchCommunity} className="text-xs px-2 py-1 rounded bg-slate-700 hover:bg-slate-600 text-white">Community</button>
+            </div>
+          </div>
+          {loadingPresets ? (
+            <p className="text-sm text-slate-500">Loading...</p>
+          ) : (
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {presets.map((p) => (
+                <div key={p.id} className="flex items-center justify-between bg-slate-900/60 border border-slate-800 rounded-lg px-3 py-2">
+                  <div>
+                    <p className="text-white font-semibold">{p.game_title}</p>
+                    <p className="text-[11px] text-slate-500">Preset • {p.triggers.length} triggers</p>
+                  </div>
+                  <button onClick={() => applyLoadout(p)} className="text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-500">Use</button>
+                </div>
+              ))}
+              {community.map((p) => (
+                <div key={p.id} className="flex items-center justify-between bg-slate-900/60 border border-slate-800 rounded-lg px-3 py-2">
+                  <div>
+                    <p className="text-white font-semibold">{p.game_title}</p>
+                    <p className="text-[11px] text-slate-500">Community • {p.triggers.length} triggers • {p.profiles?.display_name || p.profiles?.username || 'Player'}</p>
+                  </div>
+                  <button onClick={() => applyLoadout(p)} className="text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-500">Use</button>
+                </div>
+              ))}
+              {presets.length === 0 && community.length === 0 && <p className="text-sm text-slate-500">No presets/community loadouts loaded.</p>}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="space-y-6">

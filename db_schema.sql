@@ -25,6 +25,8 @@ create table loadouts (
   user_id uuid references profiles(id) not null,
   game_title text not null,
   triggers jsonb not null,
+  visibility text not null default 'private' check (visibility in ('private','public','preset')),
+  source_loadout_id uuid references loadouts(id),
   created_at timestamp with time zone default timezone('utc'::text, now())
 );
 
@@ -49,6 +51,7 @@ create policy "Users can update own data" on profiles for update using (auth.uid
 
 -- Loadouts
 create policy "Users can see own loadouts" on loadouts for select using (auth.uid() = user_id);
+create policy "Anyone can see public/preset loadouts" on loadouts for select using (visibility in ('public','preset'));
 create policy "Users can create loadouts" on loadouts for insert with check (auth.uid() = user_id);
 create policy "Users can delete own loadouts" on loadouts for delete using (auth.uid() = user_id);
 -- [ADDED UPDATE POLICY - NOV 2025]
