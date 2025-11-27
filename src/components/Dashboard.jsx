@@ -4,6 +4,7 @@ import { supabase } from '../supabaseClient';
 import { Plus, Play, Trophy, LogOut, Pencil, User, Users, Eye, Globe2, Lock, Sparkles } from 'lucide-react'; // Added Pencil
 import { getLevelProgress } from '../utilities/gameLogic';
 import BottomNav from './BottomNav';
+import StreaksBadges from './StreaksBadges';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -81,18 +82,21 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Progress Bar */}
-      <div className="bg-slate-800 p-4 rounded-xl mb-8 border border-slate-700 shadow-lg">
-        <div className="flex justify-between text-xs text-slate-400 mb-2 uppercase tracking-wide">
-          <span>Current XP</span>
-          <span>Next Level</span>
+      {/* Progress Bar + Streak/Badges */}
+      <div className="grid gap-4 mb-8 md:grid-cols-2">
+        <div className="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-lg">
+          <div className="flex justify-between text-xs text-slate-400 mb-2 uppercase tracking-wide">
+            <span>Current XP</span>
+            <span>Next Level</span>
+          </div>
+          <div className="w-full bg-slate-900 h-3 rounded-full overflow-hidden">
+            <div className="bg-blue-500 h-full transition-all" style={{ width: `${progressPercent}%` }} />
+          </div>
+          <div className="mt-2 text-right text-xs text-blue-400 font-mono">
+            {Math.floor(currentXP)} / {neededXP} XP
+          </div>
         </div>
-        <div className="w-full bg-slate-900 h-3 rounded-full overflow-hidden">
-          <div className="bg-blue-500 h-full transition-all" style={{ width: `${progressPercent}%` }} />
-        </div>
-        <div className="mt-2 text-right text-xs text-blue-400 font-mono">
-          {Math.floor(currentXP)} / {neededXP} XP
-        </div>
+        <StreaksBadges />
       </div>
 
       {/* Loadouts Grid */}

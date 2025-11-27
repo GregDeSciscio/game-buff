@@ -45,6 +45,8 @@ create table sessions (
 alter table profiles enable row level security;
 alter table loadouts enable row level security;
 alter table sessions enable row level security;
+-- alter table streaks enable row level security;
+-- alter table badges enable row level security;
 
 -- Profiles
 create policy "Users can see own data" on profiles for select using (auth.uid() = id);
@@ -70,6 +72,24 @@ alter table friends enable row level security;
 create policy "Users can view their friendships" on friends for select using (auth.uid() = requester_id or auth.uid() = addressee_id);
 create policy "Users can request friends" on friends for insert with check (auth.uid() = requester_id);
 create policy "Users can update their friendships" on friends for update using (auth.uid() = requester_id or auth.uid() = addressee_id);
+
+-- OPTIONAL: Streaks and Badges (uncomment to enable server-side)
+-- create table streaks (
+--   user_id uuid references profiles(id) primary key,
+--   current_streak int default 0,
+--   longest_streak int default 0,
+--   last_session_date date
+-- );
+-- 
+-- create table badges (
+--   id uuid default uuid_generate_v4() primary key,
+--   user_id uuid references profiles(id) not null,
+--   badge_key text not null,
+--   earned_at timestamptz default timezone('utc'::text, now())
+-- );
+-- 
+-- create policy "Users manage own streaks" on streaks for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+-- create policy "Users manage own badges" on badges for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 -- FUNCTIONS & TRIGGERS --
 create or replace function finish_session(p_loadout_id uuid, p_xp_gained int, p_duration int, p_log jsonb, p_calories numeric default 0) returns void as $$

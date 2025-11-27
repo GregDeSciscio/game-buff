@@ -40,6 +40,7 @@
 
 ## 5. Changelog
 - **[Latest] Animated Exercise Previews:** Session triggers and loadout builder show animated cues with a toggle; centralized calories helper retained.
+- **Streaks/Badges (UI only):** Dashboard shows streak/badge widget; optional tables/policies are commented in schema for future enablement.
 - **Animated Loadout Builder:** Create/Edit loadouts now show animated cues per exercise with a toggle.
 - **Hide Presets in My Loadouts:** Dashboard excludes preset visibility so users aren't stuck with non-removable presets; manage presets via Explore instead.
 - **Shared Calories Helper:** Centralized MET-based calories calculation; used in session logging and explore previews for consistent kcal/XP estimates.
