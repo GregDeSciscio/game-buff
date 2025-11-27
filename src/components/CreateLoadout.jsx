@@ -8,6 +8,7 @@ const CreateLoadout = () => {
   const navigate = useNavigate();
   const { id } = useParams(); // Capture ID from URL to check if we are editing
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   
   const [gameTitle, setGameTitle] = useState('');
   const [triggers, setTriggers] = useState([
@@ -110,6 +111,22 @@ const CreateLoadout = () => {
 
   if (loading && id && !gameTitle) return <div className="min-h-screen bg-slate-900 flex items-center justify-center text-white">Loading Loadout...</div>;
 
+  const handleDelete = async () => {
+    const confirmed = window.confirm('Delete this game/loadout? This will remove it and any dependent data. This cannot be undone.');
+    if (!confirmed) return;
+    setDeleting(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { error } = await supabase.from('loadouts').delete().eq('id', id).eq('user_id', user.id);
+    if (error) {
+      console.error(error);
+      alert('Error deleting loadout');
+      setDeleting(false);
+      return;
+    }
+    navigate('/dashboard');
+  };
+
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 p-4 pb-32 font-sans safe-area-pb">
       
@@ -164,9 +181,20 @@ const CreateLoadout = () => {
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-slate-900/90 backdrop-blur border-t border-slate-800 safe-area-pb">
-        <button onClick={handleSave} disabled={loading} className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg flex items-center justify-center gap-2 shadow-lg shadow-blue-900/20 disabled:opacity-50 transition-all">
-           {loading ? 'Saving...' : <><Save size={18} /> {id ? 'Update Loadout' : 'Save Loadout'}</>}
-        </button>
+        <div className="flex items-center gap-3">
+          {id && (
+            <button
+              onClick={handleDelete}
+              disabled={deleting}
+              className="flex-1 py-3 border border-red-600 text-red-300 hover:bg-red-600 hover:text-white rounded-lg text-sm font-semibold disabled:opacity-50 transition"
+            >
+              {deleting ? 'Deleting...' : 'Delete Loadout'}
+            </button>
+          )}
+          <button onClick={handleSave} disabled={loading} className="flex-1 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg flex items-center justify-center gap-2 shadow-lg shadow-blue-900/20 disabled:opacity-50 transition-all">
+             {loading ? 'Saving...' : <><Save size={18} /> {id ? 'Update Loadout' : 'Save Loadout'}</>}
+          </button>
+        </div>
       </div>
       <BottomNav />
     </div>
