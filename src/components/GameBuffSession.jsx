@@ -3,6 +3,7 @@ import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import { Play, Pause, X, RotateCcw, Flame } from 'lucide-react';
 import { calculateXP, getLevelProgress } from '../utilities/gameLogic';
+import { calculateCalories } from '../utilities/calories';
 import BottomNav from './BottomNav';
 import { playClick, playTimerComplete } from '../utilities/sounds';
 
@@ -112,39 +113,9 @@ const GameBuffSession = ({ initialLoadout }) => {
     }
   };
 
-  const estimateCalories = (trigger) => {
-    const weight = userWeightKg || 75;
-    const name = (trigger.exercise || '').toLowerCase();
-    const metTable = {
-      pushups: 8,
-      burpees: 10,
-      squats: 5.5,
-      lunges: 5.5,
-      situps: 4,
-      crunches: 4,
-      plank: 3.3,
-      'jumping jacks': 8,
-      pullups: 8,
-      running: 9,
-      jog: 7,
-    };
-    const matchedMet = Object.entries(metTable).find(([key]) => name.includes(key))?.[1];
-    const met = matchedMet || 5; // moderate default
-
-    let seconds = 0;
-    if (trigger.type === 'timer') {
-      seconds = trigger.amount || 0;
-    } else {
-      // rough estimate: 2 seconds per rep
-      const reps = trigger.amount || 0;
-      seconds = reps * 2;
-    }
-    return met * weight * (seconds / 3600);
-  };
-
   const logSuccess = (trigger) => {
     const gainedXP = calculateXP(trigger.exercise, trigger.amount, trigger.type);
-    const gainedCalories = estimateCalories(trigger);
+    const gainedCalories = calculateCalories(trigger, userWeightKg || 75);
     setSessionXP(prev => prev + gainedXP);
     setSessionCalories(prev => prev + gainedCalories);
     setTotalReps(prev => prev + trigger.amount);
