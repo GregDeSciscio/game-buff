@@ -60,6 +60,12 @@ const GameBuffSession = ({ initialLoadout }) => {
   const [burst, setBurst] = useState(false);
   const [levelPulse, setLevelPulse] = useState(false);
   const [unlockedBadges, setUnlockedBadges] = useState([]);
+  const badgeLabels = {
+    sessions_10: '10 Sessions',
+    sessions_25: '25 Sessions',
+    sessions_50: '50 Sessions',
+    streak_7: '7-Day Streak',
+  };
   const hasTimerTriggers = loadout?.triggers?.some((t) => t.type === 'timer');
 
   // 1. NEW: Fetch the latest version of this loadout immediately
@@ -250,6 +256,14 @@ const GameBuffSession = ({ initialLoadout }) => {
         <p className="text-[11px] text-slate-500 mb-3">Calories estimated with MET by exercise and your profile weight (default 75kg if not set).</p>
         <button onClick={handleEndSession} disabled={isSaving} className="w-full py-3 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-300 text-sm font-semibold disabled:opacity-50">{isSaving ? "Saving..." : "End Session & Save"}</button>
       </div>
+      {unlockedBadges.length > 0 && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-slate-800 border border-emerald-500 rounded-lg px-4 py-2 text-xs text-emerald-100 shadow-lg shadow-emerald-900/40">
+          <div className="flex items-center gap-2">
+            <span className="text-emerald-300">New Badge</span>
+            <span className="font-semibold">{badgeLabels[unlockedBadges[0]] || unlockedBadges[0]}</span>
+          </div>
+        </div>
+      )}
       <BottomNav />
     </div>
   );
