@@ -39,6 +39,7 @@
 - **friends:** `id`, `requester_id`, `addressee_id`, `status` (pending/accepted/blocked), `created_at`
 
 ## 5. Changelog
+- **[Latest] Hide Presets in My Loadouts:** Dashboard excludes preset visibility so users aren't stuck with non-removable presets; manage presets via Explore instead.
 - **[Latest] Shared Calories Helper:** Centralized MET-based calories calculation; used in session logging and explore previews for consistent kcal/XP estimates.
 - **[Latest] Seed Data Script:** Added `supabase_seed.sql` to insert sample users/profiles/loadouts/sessions/friends (requires real auth user IDs).
 - **[Latest] Explore Page:** Added `/explore` with Presets/Community tabs; bottom nav includes Explore link.

@@ -32,7 +32,8 @@ const Dashboard = () => {
     const { data: loadoutsData } = await supabase
       .from('loadouts')
       .select('*')
-      .eq('user_id', user.id);
+      .eq('user_id', user.id)
+      .neq('visibility', 'preset'); // hide global presets from personal list
       
     setLoadouts(loadoutsData || []);
     setLoading(false);
