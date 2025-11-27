@@ -147,7 +147,7 @@ const GameBuffSession = ({ initialLoadout }) => {
     setTotalReps(prev => prev + trigger.amount);
     const entry = {
       time: formatTime(seconds),
-      message: `+${gainedXP} XP (${trigger.exercise})`,
+      message: `+${gainedXP} XP (${trigger.exercise}) · ~${Math.round(gainedCalories)} kcal`,
       xp: gainedXP,
       amount: trigger.amount,
       type: trigger.type,
@@ -223,6 +223,7 @@ const GameBuffSession = ({ initialLoadout }) => {
              <button onClick={() => { playClick(); setIsActive(!isActive); }} className={`p-4 rounded-full ${isActive ? 'bg-yellow-600' : 'bg-green-600'}`}>{isActive ? <Pause size={24} /> : <Play size={24} />}</button>
             )}
          </div>
+        <p className="text-[11px] text-slate-500 mb-3">Calories estimated with MET by exercise and your profile weight (default 75kg if not set).</p>
         <button onClick={handleEndSession} disabled={isSaving} className="w-full py-3 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-300 text-sm font-semibold disabled:opacity-50">{isSaving ? "Saving..." : "End Session & Save"}</button>
       </div>
       <BottomNav />

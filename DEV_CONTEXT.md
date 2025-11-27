@@ -39,7 +39,7 @@
 - **friends:** `id`, `requester_id`, `addressee_id`, `status` (pending/accepted/blocked), `created_at`
 
 ## 5. Changelog
-- **[Latest] Calories Estimate:** Refined MET-based calorie estimate per exercise; sessions send kcal to RPC; UI shows kcal in sessions, history, and game recent sessions.
+- **[Latest] Calories Estimate:** Refined MET-based calorie estimate per exercise; UI shows kcal per trigger/log and a note about MET/weight assumptions; sessions send kcal to RPC; history/game show kcal.
 - **[Latest] Seed Data Script:** Added `supabase_seed.sql` to insert sample users/profiles/loadouts/sessions/friends (requires real auth user IDs).
 - **[Latest] Explore Page:** Added `/explore` with Presets/Community tabs; bottom nav includes Explore link.
 - **Share & Attribution:** Visibility picker clarifies sharing; presets/community section shows attribution and copy badge.
