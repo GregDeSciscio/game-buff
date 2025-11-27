@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { Search, Sparkles, Globe2, Loader2, ChevronDown, Timer, Flame, Zap } from 'lucide-react';
+import { calculateXP } from '../utilities/gameLogic';
 import BottomNav from './BottomNav';
 
 const Explore = () => {
@@ -104,11 +105,7 @@ const Explore = () => {
   };
 
   const estimateXP = (trigger) => {
-    // Rough align with gameLogic: 1 rep = 10 XP; timer 1s = 5 XP; simple multiplier not known here.
-    if (trigger.type === 'timer') {
-      return (trigger.amount || 0) * 5;
-    }
-    return (trigger.amount || 0) * 10;
+    return calculateXP(trigger.exercise, trigger.amount, trigger.type);
   };
 
   const renderList = (items, type) => {
