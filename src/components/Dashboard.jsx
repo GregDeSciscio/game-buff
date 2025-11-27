@@ -48,7 +48,7 @@ const Dashboard = () => {
   const { currentLevel, progressPercent, neededXP, currentXP } = getLevelProgress(profile?.total_xp || 0);
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 p-4 font-sans pb-24 safe-area-pb">
+    <div className="min-h-screen bg-slate-900 text-slate-100 p-4 font-sans pb-32 safe-area-pb">
       
       {/* Top Bar */}
       <div className="flex justify-between items-center mb-6">
@@ -56,7 +56,7 @@ const Dashboard = () => {
           <Trophy className="text-yellow-500" /> LVL {currentLevel}
         </h1>
         
-        <div className="flex gap-4">
+        <div className="flex gap-3">
           <button
             onClick={() => navigate('/friends')}
             className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white hover:bg-slate-700 transition"
@@ -66,27 +66,11 @@ const Dashboard = () => {
           </button>
 
           <button
-            onClick={() => navigate('/leaderboard')}
-            className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white hover:bg-slate-700 transition"
-            title="Leaderboards"
-          >
-            <TrophyIcon size={20} />
-          </button>
-
-          <button
             onClick={() => navigate('/profile')}
             className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white hover:bg-slate-700 transition"
             title="Profile"
           >
             <User size={20} />
-          </button>
-
-          <button 
-            onClick={() => navigate('/history')}
-            className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white hover:bg-slate-700 transition"
-            title="View History"
-          >
-            <History size={20} />
           </button>
 
           <button onClick={handleLogout} className="p-2 text-slate-500 hover:text-white" title="Logout">
@@ -162,6 +146,28 @@ const Dashboard = () => {
           <Plus size={32} className="mb-2" />
           <span className="font-bold">Add New Game</span>
         </button>
+      </div>
+
+      {/* Bottom nav */}
+      <div className="fixed bottom-0 left-0 right-0 bg-slate-900/95 border-t border-slate-800 backdrop-blur px-6 py-3 safe-area-pb">
+        <div className="flex items-center justify-around text-slate-400 text-sm">
+          <button
+            onClick={() => navigate('/history')}
+            className="flex flex-col items-center gap-1 hover:text-white transition"
+            title="History"
+          >
+            <History size={20} />
+            <span className="text-[12px]">History</span>
+          </button>
+          <button
+            onClick={() => navigate('/leaderboard')}
+            className="flex flex-col items-center gap-1 hover:text-white transition"
+            title="Leaderboards"
+          >
+            <TrophyIcon size={20} />
+            <span className="text-[12px]">Leaders</span>
+          </button>
+        </div>
       </div>
 
     </div>
