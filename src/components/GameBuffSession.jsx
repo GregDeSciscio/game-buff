@@ -246,7 +246,7 @@ const GameBuffSession = ({ initialLoadout }) => {
         <div className={`text-2xl font-mono font-bold ${isActive ? 'text-green-400' : 'text-slate-500'}`}>{formatTime(seconds)}</div>
       </div>
       <div className="px-4 pt-4">
-        <p className="text-sm text-slate-300">As you complete your reps, push the buttons to log your activity.</p>
+        <p className="text-sm text-slate-300">Complete your reps and push the buttons to log your activity.</p>
       </div>
       <div className="flex justify-between px-4 pt-3 pb-1">
         <div className="flex gap-2">
