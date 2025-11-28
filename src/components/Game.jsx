@@ -275,7 +275,6 @@ const Game = () => {
               <div className="text-center md:text-left">
                 <p className="text-xs text-slate-300 uppercase tracking-wide">Ready to grind?</p>
                 <h2 className="text-2xl font-black text-white">{loadout?.game_title || 'Start a Session'}</h2>
-                <p className="text-sm text-slate-200/80">Jump straight into a new session; triggers are tucked away for now.</p>
               </div>
               <button
                 onClick={handleStartSession}
@@ -361,7 +360,7 @@ const Game = () => {
             </div>
           </div>
 
-          <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-lg">
+          <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-lg mb-[81px]">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-base font-semibold text-white">Recent Sessions</h3>
               <div className="flex items-center gap-2">
