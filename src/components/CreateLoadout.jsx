@@ -25,6 +25,7 @@ const CreateLoadout = () => {
   const [newExerciseName, setNewExerciseName] = useState('');
   const [newExerciseReps, setNewExerciseReps] = useState(10);
   const [newExerciseWeight, setNewExerciseWeight] = useState('');
+  const [showCustomCard, setShowCustomCard] = useState(false);
 
   // Load existing data if editing
   useEffect(() => {
@@ -148,6 +149,7 @@ const CreateLoadout = () => {
     setNewExerciseName('');
     setNewExerciseReps(10);
     setNewExerciseWeight('');
+    setShowCustomCard(false);
   };
 
   const handleSave = async () => {
@@ -243,45 +245,65 @@ const CreateLoadout = () => {
       </div>
     </div>
 
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 mb-6 space-y-3">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-wider text-slate-400">Custom exercise</p>
-            <p className="text-sm text-slate-500">Add any move you want and it appears in the trigger dropdown.</p>
-          </div>
-          <button
-            onClick={handleAddCustomExercise}
-            className="text-xs uppercase tracking-wide bg-blue-600 hover:bg-blue-500 px-3 py-1 rounded-full"
-          >
-            Add
-          </button>
-        </div>
-        <div className="grid gap-3 md:grid-cols-3">
-          <input
-            type="text"
-            value={newExerciseName}
-            onChange={(e) => setNewExerciseName(e.target.value)}
-            placeholder="Exercise name"
-            className="col-span-full md:col-auto bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"
-          />
-          <input
-            type="number"
-            min="0"
-            value={newExerciseReps}
-            onChange={(e) => setNewExerciseReps(e.target.value)}
-            placeholder="Reps"
-            className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"
-          />
-          <input
-            type="number"
-            min="0"
-            value={newExerciseWeight}
-            onChange={(e) => setNewExerciseWeight(e.target.value)}
-            placeholder="Weight (optional)"
-            className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"
-          />
-        </div>
+      <div className="flex justify-center mb-4">
+        <button
+          onClick={() => setShowCustomCard(true)}
+          disabled={showCustomCard}
+          className="flex items-center gap-2 text-xs uppercase tracking-wide px-4 py-2 border border-slate-700 rounded-full text-slate-300 hover:text-white transition disabled:opacity-40"
+        >
+          <Plus size={14} />
+          + Custom Exercise
+        </button>
       </div>
+      {showCustomCard && (
+        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 mb-6 space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-wider text-slate-400">Custom exercise</p>
+              <p className="text-sm text-slate-500">Add any move you want and it appears in the trigger dropdown.</p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={handleAddCustomExercise}
+                className="text-xs uppercase tracking-wide bg-blue-600 hover:bg-blue-500 px-3 py-1 rounded-full"
+              >
+                Add
+              </button>
+              <button
+                onClick={() => setShowCustomCard(false)}
+                className="text-xs uppercase tracking-wide px-3 py-1 rounded-full border border-slate-700 text-slate-400 hover:text-white"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+          <div className="grid gap-3 md:grid-cols-3">
+            <input
+              type="text"
+              value={newExerciseName}
+              onChange={(e) => setNewExerciseName(e.target.value)}
+              placeholder="Exercise name"
+              className="col-span-full md:col-auto bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"
+            />
+            <input
+              type="number"
+              min="0"
+              value={newExerciseReps}
+              onChange={(e) => setNewExerciseReps(e.target.value)}
+              placeholder="Reps"
+              className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"
+            />
+            <input
+              type="number"
+              min="0"
+              value={newExerciseWeight}
+              onChange={(e) => setNewExerciseWeight(e.target.value)}
+              placeholder="Weight (optional)"
+              className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"
+            />
+          </div>
+        </div>
+      )}
 
       <div className="mb-6">
         <label className="block text-xs uppercase tracking-wider text-slate-400 mb-2">Game Name</label>
@@ -321,8 +343,8 @@ const CreateLoadout = () => {
           <h2 className="text-xl font-bold text-white">Base exercises</h2>
           <p className="text-sm text-slate-400">Set rep goals for each exercise.</p>
         </div>
-        <div className="grid gap-4 md:grid-cols-3">
-          {baseExercises.map((exercise) => {
+      <div className="grid gap-4 md:grid-cols-3">
+        {baseExercises.map((exercise) => {
             const meta = baseExerciseBlueprint.find((entry) => entry.name === exercise.name);
             return (
               <div key={exercise.name} className="bg-slate-900/70 border border-slate-800 rounded-xl p-4 flex flex-col gap-3">
@@ -331,9 +353,10 @@ const CreateLoadout = () => {
                   <p className="text-sm font-semibold text-white">{exercise.name}</p>
                   <button
                     onClick={() => removeBaseExercise(exercise.name)}
-                    className="text-[11px] text-red-400 hover:text-red-300 px-2 py-0.5 rounded bg-red-500/10 border border-transparent"
+                    className="text-red-400 hover:text-red-300 p-1 rounded-full bg-red-500/10 border border-transparent"
+                    title="Remove exercise"
                   >
-                    Remove
+                    <Trash2 size={14} />
                   </button>
                 </div>
                 <div className="flex items-center gap-1 bg-slate-900 border border-slate-700 rounded-full px-2">
