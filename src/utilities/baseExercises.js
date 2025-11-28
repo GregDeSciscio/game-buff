@@ -10,7 +10,7 @@ export const baseExerciseBlueprint = [
 ];
 
 export const buildBaseExerciseState = (savedExercises) => {
-  if (Array.isArray(savedExercises) && savedExercises.length > 0) {
+  if (Array.isArray(savedExercises)) {
     return savedExercises.map((exercise) => {
       const blueprintEntry = baseExerciseBlueprint.find((entry) => entry.name === exercise.name);
       return {
