@@ -152,6 +152,11 @@ const CreateLoadout = () => {
     setShowCustomCard(false);
   };
 
+  const resetBaseExercises = () => {
+    if (!window.confirm('Reset base exercises to defaults? This will remove any custom additions and deletions.')) return;
+    setBaseExercises(buildBaseExerciseState());
+  };
+
   const handleSave = async () => {
     if (!gameTitle.trim()) {
         alert("Please enter a game name");
@@ -280,8 +285,19 @@ const CreateLoadout = () => {
       </div>
       <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-slate-700 rounded-2xl p-5 mb-6 shadow-2xl shadow-slate-900/40">
         <div className="flex flex-col gap-1 mb-4">
-          <h2 className="text-xl font-bold text-white">Base Workout</h2>
-          <p className="text-sm text-slate-400">Set rep goals for each exercise.</p>
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-bold text-white">Base Workout</h2>
+              <p className="text-sm text-slate-400">Set rep goals for each exercise.</p>
+            </div>
+            <button
+              type="button"
+              onClick={resetBaseExercises}
+              className="text-xs uppercase tracking-wide px-3 py-1 rounded-full border border-slate-700 text-slate-400 hover:text-white"
+            >
+              Reset base workout
+            </button>
+          </div>
         </div>
         <div className="grid gap-4 md:grid-cols-3">
           {baseExercises.map((exercise) => {
