@@ -60,6 +60,7 @@ const GameBuffSession = ({ initialLoadout }) => {
   const [levelPulse, setLevelPulse] = useState(false);
   const [unlockedBadges, setUnlockedBadges] = useState([]);
   const [compactView, setCompactView] = useState(false);
+  const [triggersFirst, setTriggersFirst] = useState(false);
   const badgeLabels = {
     sessions_10: '10 Sessions',
     sessions_25: '25 Sessions',
@@ -197,24 +198,23 @@ const GameBuffSession = ({ initialLoadout }) => {
     prevLevelRef.current = currentLevel;
   }, [currentLevel]);
 
-  const buttonItems = [
-    ...sessionBaseExercises.map((exercise) => ({
-      id: `base-${exercise.name}`,
-      title: exercise.name,
-      subtitle: `+${exercise.reps} reps`,
-      detail: exercise.weight !== undefined ? `Weight: ${exercise.weight} lbs` : null,
-      onClick: () => handleBaseExercise(exercise),
-      variant: 'base',
-    })),
-    ...(loadout?.triggers || []).map((trigger, idx) => ({
-      id: `trigger-${trigger.id || idx}`,
-      title: trigger.label || trigger.exercise,
-      subtitle: `+${trigger.amount} ${trigger.exercise}`,
-      color: trigger.color,
-      onClick: () => handleTrigger(trigger),
-      variant: 'trigger',
-    })),
-  ];
+  const baseButtons = sessionBaseExercises.map((exercise) => ({
+    id: `base-${exercise.name}`,
+    title: exercise.name,
+    subtitle: `+${exercise.reps} reps`,
+    detail: exercise.weight !== undefined ? `Weight: ${exercise.weight} lbs` : null,
+    onClick: () => handleBaseExercise(exercise),
+    variant: 'base',
+  }));
+  const triggerButtons = (loadout?.triggers || []).map((trigger, idx) => ({
+    id: `trigger-${trigger.id || idx}`,
+    title: trigger.label || trigger.exercise,
+    subtitle: `+${trigger.amount} ${trigger.exercise}`,
+    color: trigger.color,
+    onClick: () => handleTrigger(trigger),
+    variant: 'trigger',
+  }));
+  const buttonItems = triggersFirst ? [...triggerButtons, ...baseButtons] : [...baseButtons, ...triggerButtons];
   const buttonPaddingClass = compactView ? 'py-1' : 'py-4';
   const titleSizeClass = compactView ? 'text-xl' : 'text-3xl';
   const titleTrackingClass = compactView ? 'tracking-[0.1em]' : 'tracking-[0.25em]';
@@ -246,12 +246,20 @@ const GameBuffSession = ({ initialLoadout }) => {
         <div className={`text-2xl font-mono font-bold ${isActive ? 'text-green-400' : 'text-slate-500'}`}>{formatTime(seconds)}</div>
       </div>
       <div className="flex justify-between px-4 pt-3 pb-1">
-        <button
-          onClick={() => setCompactView(!compactView)}
-          className="text-[11px] uppercase tracking-wider rounded-full px-3 py-1 border border-slate-700 text-slate-400 hover:text-white transition"
-        >
-          {compactView ? 'Regular' : 'Compact'}
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setCompactView(!compactView)}
+            className="text-[11px] uppercase tracking-wider rounded-full px-3 py-1 border border-slate-700 text-slate-400 hover:text-white transition"
+          >
+            {compactView ? 'Regular' : 'Compact'}
+          </button>
+          <button
+            onClick={() => setTriggersFirst((prev) => !prev)}
+            className="text-[11px] uppercase tracking-wider rounded-full px-3 py-1 border border-slate-700 text-slate-400 hover:text-white transition"
+          >
+            {triggersFirst ? 'Triggers First' : 'Triggers Last'}
+          </button>
+        </div>
       </div>
       <div className="px-4">
         {log[0] && (
