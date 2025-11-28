@@ -59,7 +59,7 @@ const GameBuffSession = ({ initialLoadout }) => {
   const [burst, setBurst] = useState(false);
   const [levelPulse, setLevelPulse] = useState(false);
   const [unlockedBadges, setUnlockedBadges] = useState([]);
-  const [compactView, setCompactView] = useState(false);
+  const [compactView, setCompactView] = useState(true);
   const [triggersFirst, setTriggersFirst] = useState(true);
   const badgeLabels = {
     sessions_10: '10 Sessions',
