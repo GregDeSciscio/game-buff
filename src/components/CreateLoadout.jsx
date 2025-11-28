@@ -280,7 +280,7 @@ const CreateLoadout = () => {
       </div>
       <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-slate-700 rounded-2xl p-5 mb-6 shadow-2xl shadow-slate-900/40">
         <div className="flex flex-col gap-1 mb-4">
-          <h2 className="text-xl font-bold text-white">Base exercises</h2>
+          <h2 className="text-xl font-bold text-white">Base Workout</h2>
           <p className="text-sm text-slate-400">Set rep goals for each exercise.</p>
         </div>
         <div className="grid gap-4 md:grid-cols-3">
@@ -350,7 +350,7 @@ const CreateLoadout = () => {
             className="flex items-center gap-2 text-xs uppercase tracking-wide px-4 py-2 border border-slate-700 rounded-full text-slate-300 hover:text-white transition disabled:opacity-40"
           >
             <Plus size={14} />
-            + Custom Exercise
+            Custom Exercise
           </button>
         </div>
         {showCustomCard && (

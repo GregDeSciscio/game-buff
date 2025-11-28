@@ -9,19 +9,29 @@ export const baseExerciseBlueprint = [
   { name: 'Burpees', defaultReps: 5 },
 ];
 
-export const buildBaseExerciseState = (overrides = []) =>
-  baseExerciseBlueprint.map((exercise) => {
-    const match = Array.isArray(overrides)
-      ? overrides.find((item) => item.name === exercise.name)
-      : null;
-    return {
-      name: exercise.name,
-      reps: typeof match?.reps === 'number' ? match.reps : exercise.defaultReps,
-      weight:
-        exercise.hasWeight
-          ? typeof match?.weight === 'number'
-            ? match.weight
-            : exercise.defaultWeight
-          : undefined,
-    };
-  });
+export const buildBaseExerciseState = (savedExercises) => {
+  if (Array.isArray(savedExercises) && savedExercises.length > 0) {
+    return savedExercises.map((exercise) => {
+      const blueprintEntry = baseExerciseBlueprint.find((entry) => entry.name === exercise.name);
+      return {
+        name: exercise.name,
+        reps:
+          typeof exercise.reps === 'number'
+            ? exercise.reps
+            : blueprintEntry?.defaultReps ?? 0,
+        weight:
+          exercise?.weight !== undefined
+            ? exercise.weight
+            : blueprintEntry?.hasWeight
+            ? blueprintEntry.defaultWeight
+            : undefined,
+      };
+    });
+  }
+
+  return baseExerciseBlueprint.map((exercise) => ({
+    name: exercise.name,
+    reps: exercise.defaultReps,
+    weight: exercise.hasWeight ? exercise.defaultWeight : undefined,
+  }));
+};
