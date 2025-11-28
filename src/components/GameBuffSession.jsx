@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
-import { Play, Pause, X, RotateCcw, Flame } from 'lucide-react';
+import { Play, Pause, X, RotateCcw } from 'lucide-react';
 import { calculateXP, getLevelProgress } from '../utilities/gameLogic';
 import { calculateCalories } from '../utilities/calories';
-import { getExerciseMedia } from '../utilities/exerciseMedia';
 import BottomNav from './BottomNav';
 import { playClick, playTimerComplete } from '../utilities/sounds';
+import { buildBaseExerciseState } from '../utilities/baseExercises';
 
 const TimerModal = ({ trigger, onComplete, onCancel }) => {
   const [timeLeft, setTimeLeft] = useState(trigger.amount);
@@ -56,7 +56,6 @@ const GameBuffSession = ({ initialLoadout }) => {
   const [log, setLog] = useState([]);
   const [activeTimerTrigger, setActiveTimerTrigger] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [showMedia, setShowMedia] = useState(true);
   const [burst, setBurst] = useState(false);
   const [levelPulse, setLevelPulse] = useState(false);
   const [unlockedBadges, setUnlockedBadges] = useState([]);
@@ -67,6 +66,20 @@ const GameBuffSession = ({ initialLoadout }) => {
     streak_7: '7-Day Streak',
   };
   const hasTimerTriggers = loadout?.triggers?.some((t) => t.type === 'timer');
+  const sessionBaseExercises = React.useMemo(
+    () => buildBaseExerciseState(loadout?.base_exercises || []),
+    [loadout?.base_exercises]
+  );
+
+  const handleBaseExercise = (exercise) => {
+    handleTrigger({
+      exercise: exercise.name,
+      amount: exercise.reps,
+      type: 'reps',
+      weight: exercise.weight,
+      label: exercise.name,
+    });
+  };
 
   // 1. NEW: Fetch the latest version of this loadout immediately
   useEffect(() => {
@@ -134,14 +147,15 @@ const GameBuffSession = ({ initialLoadout }) => {
     setTotalReps(prev => prev + trigger.amount);
     const entry = {
       time: formatTime(seconds),
-      message: `+${gainedXP} XP (${trigger.exercise}) · ~${Math.round(gainedCalories)} kcal`,
+      message: `+${gainedXP} XP (${trigger.exercise}${trigger.weight ? ` @ ${trigger.weight} lbs` : ''}) · ~${Math.round(gainedCalories)} kcal`,
       xp: gainedXP,
       amount: trigger.amount,
       type: trigger.type,
       exercise: trigger.exercise,
+      weight: trigger.weight,
       calories: gainedCalories
     };
-    setLog([entry, ...log]);
+    setLog((prev) => [entry, ...prev]);
     setActiveTimerTrigger(null);
   };
 
@@ -182,8 +196,27 @@ const GameBuffSession = ({ initialLoadout }) => {
     prevLevelRef.current = currentLevel;
   }, [currentLevel]);
 
+  const buttonItems = [
+    ...sessionBaseExercises.map((exercise) => ({
+      id: `base-${exercise.name}`,
+      title: exercise.name,
+      subtitle: `+${exercise.reps} reps`,
+      detail: exercise.weight !== undefined ? `Weight: ${exercise.weight} lbs` : null,
+      onClick: () => handleBaseExercise(exercise),
+      variant: 'base',
+    })),
+    ...(loadout?.triggers || []).map((trigger, idx) => ({
+      id: `trigger-${trigger.id || idx}`,
+      title: trigger.label || trigger.exercise,
+      subtitle: `+${trigger.amount} ${trigger.exercise}`,
+      color: trigger.color,
+      onClick: () => handleTrigger(trigger),
+      variant: 'trigger',
+    })),
+  ];
+
   return (
-    <div className="flex flex-col h-screen bg-slate-900 text-slate-100 font-sans pb-32">
+    <div className="flex flex-col h-screen bg-slate-900 text-slate-100 font-sans pb-[280px]">
       {hasTimerTriggers && activeTimerTrigger && (
         <TimerModal trigger={activeTimerTrigger} onComplete={logSuccess} onCancel={() => setActiveTimerTrigger(null)} />
       )}
@@ -206,55 +239,73 @@ const GameBuffSession = ({ initialLoadout }) => {
         <div><h2 className="text-xs text-slate-400 uppercase tracking-widest">Current Game</h2><h1 className="text-xl font-bold text-white">{loadout.game_title}</h1></div>
         <div className={`text-2xl font-mono font-bold ${isActive ? 'text-green-400' : 'text-slate-500'}`}>{formatTime(seconds)}</div>
       </div>
-      <div className="flex justify-end px-4 pt-2">
-        <button
-          onClick={() => setShowMedia(!showMedia)}
-          className="text-[11px] text-slate-400 hover:text-white px-3 py-1 border border-slate-700 rounded-full"
-        >
-          {showMedia ? 'Hide animations' : 'Show animations'}
-        </button>
+      <div className="px-4">
+        {log[0] && (
+          <p className="text-xs text-slate-400 mb-2">Latest: {log[0].message}</p>
+        )}
       </div>
-
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {/* Updated to map over 'loadout.triggers' instead of 'initialLoadout' */}
-        {loadout.triggers.map((trigger, idx) => (
-          <button key={idx} onClick={() => handleTrigger(trigger)} className={`w-full py-8 rounded-xl shadow-lg transform transition active:scale-95 flex flex-col items-center justify-center ${trigger.color}`}>
-            <span className="text-2xl font-black uppercase tracking-wider text-white drop-shadow-md">{trigger.label}</span>
-            <span className="text-sm font-medium text-white/90 mt-1 bg-black/20 px-3 py-1 rounded-full">+{trigger.amount} {trigger.exercise}</span>
-            {showMedia && getExerciseMedia(trigger.exercise) && (
-              <span className="mt-2 inline-flex items-center gap-2 text-xs text-slate-200">
-                <span className="relative w-8 h-8 rounded-full overflow-hidden border border-white/10">
-                  <span className="absolute inset-0 bg-gradient-to-br from-emerald-400/70 via-sky-400/70 to-purple-500/70 animate-[spin_3s_linear_infinite] opacity-70" />
-                  <span className="absolute inset-1 bg-slate-900/70 rounded-full" />
-                </span>
-                Animated cue
-              </span>
-            )}
-          </button>
-        ))}
-      </div>
-
-      <div className="px-4 pb-2 h-8 text-center">{log.length > 0 && <span className="text-slate-400 text-sm animate-pulse">Latest: {log[0].message}</span>}</div>
-
-      <div className="bg-slate-800 p-4 border-t border-slate-700 safe-area-pb">
-        <div className="w-full bg-slate-700 h-4 rounded-full mb-4 overflow-hidden relative">
-            <div className={`bg-yellow-500 h-full transition-all duration-500 ease-out ${levelPulse ? 'animate-pulse' : ''}`} style={{ width: `${progressPercent}%` }} />
-            <div className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-white shadow-black drop-shadow-md">LEVEL {currentLevel} ({Math.floor(currentXP)} / {neededXP} XP)</div>
+      <div className="flex-1 overflow-hidden px-4">
+        <div className="h-full overflow-y-auto space-y-4 pb-6 pt-2">
+          {buttonItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={item.onClick}
+              className={`w-full rounded-3xl border border-slate-800 shadow-2xl shadow-black/40 transform transition active:scale-95 flex flex-col justify-center gap-2 px-6 ${
+                item.variant === 'trigger'
+                  ? `py-8 ${item.color} text-white`
+                  : 'py-10 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white'
+              }`}
+            >
+              <p className="text-3xl font-black uppercase tracking-[0.25em]">{item.title}</p>
+              <p className="text-lg font-semibold">{item.subtitle}</p>
+              {item.detail && <p className="text-sm font-semibold text-amber-300">{item.detail}</p>}
+            </button>
+          ))}
         </div>
-        <div className="flex justify-between items-center mb-4">
-           <div className="flex flex-col">
-             <span className="text-xs text-slate-400 uppercase">Total Reps</span>
-             <span className="text-3xl font-bold text-blue-400">{totalReps}</span>
-             <span className="text-xs text-orange-300 flex items-center gap-1 mt-1">
-               <Flame size={12} /> ~{Math.round(sessionCalories)} kcal
-             </span>
-           </div>
-           {hasTimerTriggers && (
-             <button onClick={() => { playClick(); setIsActive(!isActive); }} className={`p-4 rounded-full ${isActive ? 'bg-yellow-600' : 'bg-green-600'}`}>{isActive ? <Pause size={24} /> : <Play size={24} />}</button>
+      </div>
+
+      <div className="fixed inset-x-0 bottom-16 px-4 pb-4">
+        <div className="rounded-2xl bg-slate-900/90 border border-slate-700 p-4 shadow-2xl">
+          <div className="flex items-center gap-4 mb-3">
+            <div className="flex-1">
+              <p className="text-[11px] uppercase tracking-wide text-slate-400">Level</p>
+              <p className="text-sm text-white font-semibold">
+                LEVEL {currentLevel} ({Math.floor(currentXP)} / {neededXP} XP)
+              </p>
+            </div>
+            <div className="flex-1 text-right">
+              <p className="text-[11px] uppercase tracking-wide text-slate-400">Total Reps</p>
+              <p className="text-lg font-bold text-blue-400">{totalReps}</p>
+            </div>
+            {hasTimerTriggers && (
+              <button
+                onClick={() => {
+                  playClick();
+                  setIsActive(!isActive);
+                }}
+                className={`px-4 py-2 text-xs font-semibold uppercase rounded-full ${isActive ? 'bg-yellow-600 text-slate-900' : 'bg-green-600 text-slate-900'}`}
+              >
+                {isActive ? 'Pause Timer' : 'Start Timer'}
+              </button>
             )}
-         </div>
-        <p className="text-[11px] text-slate-500 mb-3">Calories estimated with MET by exercise and your profile weight (default 75kg if not set).</p>
-        <button onClick={handleEndSession} disabled={isSaving} className="w-full py-3 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-300 text-sm font-semibold disabled:opacity-50">{isSaving ? "Saving..." : "End Session & Save"}</button>
+          </div>
+          <div className="relative mb-3">
+            <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+              <div
+                className={`h-full bg-yellow-500 transition-all duration-500 ease-out ${levelPulse ? 'animate-pulse' : ''}`}
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+            <p className="text-[10px] text-slate-500 mt-1 text-center">~{Math.round(sessionCalories)} kcal</p>
+          </div>
+          <button
+            onClick={handleEndSession}
+            disabled={isSaving}
+            className="w-full py-4 bg-gradient-to-r from-emerald-500 via-lime-400 to-blue-500 text-slate-900 font-bold text-lg uppercase rounded-2xl shadow-lg shadow-emerald-500/40 disabled:opacity-60"
+          >
+            {isSaving ? 'Saving...' : 'End Session & Save'}
+          </button>
+        </div>
       </div>
       {unlockedBadges.length > 0 && (
         <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-slate-800 border border-emerald-500 rounded-lg px-4 py-2 text-xs text-emerald-100 shadow-lg shadow-emerald-900/40">

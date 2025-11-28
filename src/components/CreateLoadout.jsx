@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Plus, Trash2, Save, Gamepad2, ArrowLeft, Share2 } from 'lucide-react';
 import BottomNav from './BottomNav';
 import { getExerciseMedia } from '../utilities/exerciseMedia';
+import { baseExerciseBlueprint, buildBaseExerciseState } from '../utilities/baseExercises';
 
 const CreateLoadout = () => {
   const navigate = useNavigate();
@@ -14,15 +15,13 @@ const CreateLoadout = () => {
   const [loadoutOwnerId, setLoadoutOwnerId] = useState(null);
   const [visibility, setVisibility] = useState('private');
   const [sourceLoadoutId, setSourceLoadoutId] = useState(null);
-  const [presets, setPresets] = useState([]);
-  const [community, setCommunity] = useState([]);
-  const [loadingPresets, setLoadingPresets] = useState(false);
   const [showMedia, setShowMedia] = useState(true);
 
   const [gameTitle, setGameTitle] = useState('');
   const [triggers, setTriggers] = useState([
     { id: 1, label: '', exercise: 'Pushups', amount: 10, type: 'reps', color: 'bg-red-600' }
   ]);
+  const [baseExercises, setBaseExercises] = useState(() => buildBaseExerciseState());
 
   // Load existing data if editing
   useEffect(() => {
@@ -51,6 +50,7 @@ const CreateLoadout = () => {
       setGameTitle(data.game_title);
       // Ensure triggers are set correctly from JSONB
       setTriggers(data.triggers);
+      setBaseExercises(buildBaseExerciseState(data.base_exercises));
       setVisibility(data.visibility || 'private');
       setSourceLoadoutId(data.source_loadout_id || null);
       setLoadoutOwnerId(data.user_id);
@@ -65,7 +65,7 @@ const CreateLoadout = () => {
     { name: 'Purple', value: 'bg-purple-600' },
     { name: 'Orange', value: 'bg-orange-600' },
   ];
-  const commonExercises = ['Pushups', 'Squats', 'Situps', 'Plank', 'Burpees', 'Lunges'];
+  const commonExercises = baseExerciseBlueprint.map((exercise) => exercise.name);
   const TIMER_KEYWORDS = ['plank', 'hold', 'wall sit', 'stretch', 'hang'];
 
   const addTrigger = () => {
@@ -88,6 +88,32 @@ const CreateLoadout = () => {
     }
   };
 
+  const updateBaseExercise = (exerciseName, field, value) => {
+    setBaseExercises((prev) =>
+      prev.map((exercise) =>
+        exercise.name === exerciseName
+          ? {
+              ...exercise,
+              [field]: field === 'reps' || field === 'weight' ? Math.max(0, Number(value) || 0) : value,
+            }
+          : exercise
+      )
+    );
+  };
+
+  const adjustBaseExercise = (exerciseName, delta) => {
+    setBaseExercises((prev) =>
+      prev.map((exercise) =>
+        exercise.name === exerciseName
+          ? {
+              ...exercise,
+              reps: Math.max(0, (exercise.reps || 0) + delta),
+            }
+          : exercise
+      )
+    );
+  };
+
   const handleSave = async () => {
     if (!gameTitle.trim()) {
         alert("Please enter a game name");
@@ -102,6 +128,7 @@ const CreateLoadout = () => {
       user_id: user.id,
       game_title: gameTitle,
       triggers: triggers,
+      base_exercises: baseExercises,
       visibility,
       source_loadout_id: sourceLoadoutId,
     };
@@ -159,38 +186,6 @@ const CreateLoadout = () => {
     navigate('/dashboard');
   };
 
-  const fetchPresets = async () => {
-    setLoadingPresets(true);
-    const title = gameTitle.trim();
-    const filters = title ? { column: 'game_title', value: title } : null;
-    let query = supabase.from('loadouts').select('*').eq('visibility', 'preset').limit(10);
-    if (filters) query = query.eq(filters.column, filters.value);
-    const { data } = await query;
-    setPresets(data || []);
-    setLoadingPresets(false);
-  };
-
-  const fetchCommunity = async () => {
-    setLoadingPresets(true);
-    const title = gameTitle.trim();
-    const { data } = await supabase
-      .from('loadouts')
-      .select('*, profiles(display_name, username)')
-      .eq('visibility', 'public')
-      .ilike('game_title', title ? title : '%')
-      .order('created_at', { ascending: false })
-      .limit(10);
-    setCommunity(data || []);
-    setLoadingPresets(false);
-  };
-
-  const applyLoadout = (loadout) => {
-    setGameTitle(loadout.game_title);
-    setTriggers(loadout.triggers);
-    setSourceLoadoutId(loadout.id);
-    setVisibility('private');
-  };
-
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 p-4 pb-40 font-sans safe-area-pb">
 
@@ -223,66 +218,89 @@ const CreateLoadout = () => {
         )}
       </div>
 
-      <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-3">
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-3">
-          <label className="block text-xs uppercase tracking-wider text-slate-400 mb-2">Visibility</label>
+      <div className="mb-4">
+        <div className="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 space-y-3">
+          <div>
+            <p className="text-xs uppercase tracking-wider text-slate-400">Visibility</p>
+          </div>
           <div className="flex gap-2">
             {['private', 'public'].map((option) => (
               <button
                 key={option}
                 onClick={() => setVisibility(option)}
-                className={`flex-1 py-2 rounded-lg border ${visibility === option ? 'border-blue-500 text-white' : 'border-slate-700 text-slate-400'}`}
+                className={`flex-1 py-2 rounded-lg border text-sm font-semibold ${visibility === option ? 'border-blue-500 text-white' : 'border-slate-700 text-slate-400'}`}
               >
                 {option === 'private' ? 'Private' : 'Share with Community'}
               </button>
             ))}
           </div>
-          <p className="text-[11px] text-slate-500 mt-2 flex items-start gap-2">
+          <p className="text-[11px] text-slate-500 flex items-start gap-2">
             <Share2 size={12} className="mt-0.5 text-blue-400" />
             Public loadouts appear in Community and can be copied by others. Private stays yours.
           </p>
         </div>
-
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-3 md:col-span-2">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-xs uppercase tracking-wider text-slate-400">Presets & Community</span>
-            <div className="flex gap-2">
-              <button onClick={fetchPresets} className="text-xs px-2 py-1 rounded bg-slate-700 hover:bg-slate-600 text-white">Presets</button>
-              <button onClick={fetchCommunity} className="text-xs px-2 py-1 rounded bg-slate-700 hover:bg-slate-600 text-white">Community</button>
-            </div>
-          </div>
-          {loadingPresets ? (
-            <p className="text-sm text-slate-500">Loading...</p>
-          ) : (
-            <div className="space-y-2 max-h-48 overflow-y-auto">
-              {presets.map((p) => (
-                <div key={p.id} className="flex items-center justify-between bg-slate-900/60 border border-slate-800 rounded-lg px-3 py-2">
-                  <div>
-                    <p className="text-white font-semibold">{p.game_title}</p>
-                    <p className="text-[11px] text-slate-500">Preset · {p.triggers.length} triggers</p>
-                  </div>
-                  <button onClick={() => applyLoadout(p)} className="text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-500">Use</button>
+      </div>
+      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-slate-700 rounded-2xl p-5 mb-6 shadow-2xl shadow-slate-900/40">
+        <div className="flex flex-col gap-1 mb-4">
+          <p className="text-xs uppercase tracking-wider text-slate-400">Freeform Defaults</p>
+          <h2 className="text-xl font-bold text-white">Base exercises</h2>
+          <p className="text-sm text-slate-400">Set rep goals for each preset exercise before building triggers on top.</p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          {baseExercises.map((exercise) => {
+            const meta = baseExerciseBlueprint.find((entry) => entry.name === exercise.name);
+            return (
+              <div key={exercise.name} className="bg-slate-900/70 border border-slate-800 rounded-xl p-4 flex flex-col gap-3">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm font-semibold text-white">{exercise.name}</p>
+                <div className="flex items-center gap-1 bg-slate-900 border border-slate-700 rounded-full px-2">
+                  <button
+                    type="button"
+                    onClick={() => adjustBaseExercise(exercise.name, -1)}
+                    className="text-xs font-bold text-slate-400 hover:text-white px-2 py-1 rounded-full transition"
+                  >
+                    &minus;
+                  </button>
+                  <input
+                    type="number"
+                    min="0"
+                    value={exercise.reps}
+                    onChange={(e) => updateBaseExercise(exercise.name, 'reps', e.target.value)}
+                    className="w-14 bg-transparent border-none text-center text-sm outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => adjustBaseExercise(exercise.name, 1)}
+                    className="text-xs font-bold text-slate-400 hover:text-white px-2 py-1 rounded-full transition"
+                  >
+                    +
+                  </button>
                 </div>
-              ))}
-              {community.map((p) => (
-                <div key={p.id} className="flex items-center justify-between bg-slate-900/60 border border-slate-800 rounded-lg px-3 py-2">
-                  <div>
-                    <p className="text-white font-semibold">{p.game_title}</p>
-                    <p className="text-[11px] text-slate-500">
-                      Community · {p.triggers.length} triggers · {p.profiles?.display_name || p.profiles?.username || 'Player'}
-                      {p.source_loadout_id && <span> · Copy</span>}
-                    </p>
+              </div>
+                <p className="text-[11px] text-slate-500">Reps</p>
+                {meta?.hasWeight && (
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[11px] text-slate-500 uppercase tracking-wide">Weight (lbs)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={exercise.weight || 0}
+                      onChange={(e) => updateBaseExercise(exercise.name, 'weight', e.target.value)}
+                      className="bg-slate-900 border border-slate-700 rounded-lg text-sm px-2 py-1 outline-none focus:border-blue-500"
+                    />
                   </div>
-                  <button onClick={() => applyLoadout(p)} className="text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-500">Use</button>
-                </div>
-              ))}
-              {presets.length === 0 && community.length === 0 && <p className="text-sm text-slate-500">No presets/community loadouts loaded.</p>}
-            </div>
-          )}
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
       <div className="space-y-6">
+        <div className="flex flex-col gap-1">
+          <p className="text-xs uppercase tracking-wider text-slate-400">Triggers</p>
+          <p className="text-[11px] text-slate-500">Use triggers to turn specific moments into rep or timer bursts on top of the base exercises.</p>
+        </div>
         {triggers.map((trigger) => (
           <div key={trigger.id} className="bg-slate-800 p-4 rounded-xl border border-slate-700 relative animate-fade-in-down">
             <button onClick={() => removeTrigger(trigger.id)} className="absolute top-2 right-2 text-slate-500 hover:text-red-400 p-2 transition-colors"><Trash2 size={16} /></button>

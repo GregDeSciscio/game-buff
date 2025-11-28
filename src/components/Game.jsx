@@ -270,36 +270,22 @@ const Game = () => {
         <div className="text-center text-slate-500 mt-16">Loading activity...</div>
       ) : (
         <>
-          <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 mb-6 shadow-lg">
-            <div className="flex justify-between items-center mb-4">
-              <div>
-                <p className="text-xs text-slate-400 uppercase">Triggers</p>
-                <p className="text-lg font-semibold text-white">{loadout?.triggers?.length || 0} available</p>
+          <div className="bg-gradient-to-r from-blue-700/60 via-slate-800 to-emerald-600/60 border border-slate-700 rounded-xl p-5 mb-6 shadow-lg">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="text-center md:text-left">
+                <p className="text-xs text-slate-300 uppercase tracking-wide">Ready to grind?</p>
+                <h2 className="text-2xl font-black text-white">{loadout?.game_title || 'Start a Session'}</h2>
+                <p className="text-sm text-slate-200/80">Jump straight into a new session; triggers are tucked away for now.</p>
               </div>
               <button
                 onClick={handleStartSession}
                 disabled={!loadout}
-                className="flex items-center gap-2 bg-green-600 hover:bg-green-500 disabled:bg-slate-700 disabled:text-slate-400 text-white px-4 py-2 rounded-lg shadow-lg shadow-green-900/30 transition"
+                className="w-full md:w-auto flex items-center justify-center gap-3 bg-green-600 hover:bg-green-500 disabled:bg-slate-700 disabled:text-slate-400 text-white px-6 py-4 rounded-xl text-lg font-semibold shadow-[0_10px_40px_-12px_rgba(16,185,129,0.7)] transition"
               >
-                <Play size={18} /> Start Session
+                <Play size={22} />
+                Start Session
               </button>
             </div>
-
-            {loadout?.triggers?.length ? (
-              <div className="flex flex-wrap gap-2">
-                {loadout.triggers.map((trigger, idx) => (
-                  <span
-                    key={trigger.id || idx}
-                    className={`text-xs px-3 py-2 rounded-full border border-slate-700 ${trigger.color} text-white shadow-sm`}
-                  >
-                    {trigger.label || 'Trigger'} · {trigger.amount}
-                    {trigger.type === 'timer' ? 's' : ' reps'} {trigger.exercise}
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-slate-400">No triggers found for this game.</p>
-            )}
           </div>
 
           <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 mb-6 shadow-lg">

@@ -25,6 +25,7 @@ create table loadouts (
   user_id uuid references profiles(id) not null,
   game_title text not null,
   triggers jsonb not null,
+  base_exercises jsonb not null default '[]',
   visibility text not null default 'private' check (visibility in ('private','public','preset')),
   source_loadout_id uuid references loadouts(id),
   created_at timestamp with time zone default timezone('utc'::text, now())
