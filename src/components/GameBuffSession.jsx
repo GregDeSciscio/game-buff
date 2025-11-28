@@ -245,13 +245,16 @@ const GameBuffSession = ({ initialLoadout }) => {
         <div><h2 className="text-xs text-slate-400 uppercase tracking-widest">Current Game</h2><h1 className="text-xl font-bold text-white">{loadout.game_title}</h1></div>
         <div className={`text-2xl font-mono font-bold ${isActive ? 'text-green-400' : 'text-slate-500'}`}>{formatTime(seconds)}</div>
       </div>
+      <div className="px-4 pt-4">
+        <p className="text-sm text-slate-300">As you complete your reps, push the buttons to log your activity.</p>
+      </div>
       <div className="flex justify-between px-4 pt-3 pb-1">
         <div className="flex gap-2">
           <button
             onClick={() => setCompactView(!compactView)}
             className="text-[11px] uppercase tracking-wider rounded-full px-3 py-1 border border-slate-700 text-slate-400 hover:text-white transition"
           >
-            {compactView ? 'Regular' : 'Compact'}
+            {compactView ? 'Relaxed' : 'Compact'}
           </button>
           <button
             onClick={() => setTriggersFirst((prev) => !prev)}
