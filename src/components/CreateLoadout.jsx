@@ -230,7 +230,7 @@ const CreateLoadout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 p-4 pb-40 font-sans safe-area-pb">
+    <div className="min-h-screen bg-slate-900 text-slate-100 p-4 pb-56 font-sans safe-area-pb">
 
       {/* Header */}
       <div className="mb-8 flex items-center gap-3">
@@ -420,7 +420,7 @@ const CreateLoadout = () => {
         )}
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-6 pb-24">
         <div className="flex flex-col gap-1">
           <p className="text-xs uppercase tracking-wider text-slate-400">Triggers</p>
           <p className="text-[11px] text-slate-500">Use triggers to turn specific moments into rep or timer bursts on top of the base exercises.</p>
