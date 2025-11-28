@@ -277,19 +277,22 @@ const CreateLoadout = () => {
                   </button>
                 </div>
               </div>
-                <p className="text-[11px] text-slate-500">Reps</p>
+              <div className="flex items-center gap-6 text-[11px] text-slate-500">
+                <span>Reps</span>
                 {meta?.hasWeight && (
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[11px] text-slate-500 uppercase tracking-wide">Weight (lbs)</label>
+                  <label className="flex items-center gap-2 text-[11px] text-slate-500">
+                    <span className="whitespace-nowrap">Weight</span>
                     <input
                       type="number"
                       min="0"
                       value={exercise.weight || 0}
                       onChange={(e) => updateBaseExercise(exercise.name, 'weight', e.target.value)}
-                      className="bg-slate-900 border border-slate-700 rounded-lg text-sm px-2 py-1 outline-none focus:border-blue-500"
+                      className="w-16 bg-slate-900 border border-slate-700 rounded-lg text-sm px-2 py-1 outline-none focus:border-blue-500"
                     />
-                  </div>
+                    <span className="text-[11px] text-slate-400">lbs</span>
+                  </label>
                 )}
+              </div>
               </div>
             );
           })}

@@ -59,6 +59,7 @@ const GameBuffSession = ({ initialLoadout }) => {
   const [burst, setBurst] = useState(false);
   const [levelPulse, setLevelPulse] = useState(false);
   const [unlockedBadges, setUnlockedBadges] = useState([]);
+  const [compactView, setCompactView] = useState(false);
   const badgeLabels = {
     sessions_10: '10 Sessions',
     sessions_25: '25 Sessions',
@@ -214,6 +215,11 @@ const GameBuffSession = ({ initialLoadout }) => {
       variant: 'trigger',
     })),
   ];
+  const buttonPaddingClass = compactView ? 'py-1' : 'py-4';
+  const titleSizeClass = compactView ? 'text-xl' : 'text-3xl';
+  const titleTrackingClass = compactView ? 'tracking-[0.1em]' : 'tracking-[0.25em]';
+  const subtitleSizeClass = compactView ? 'text-base' : 'text-lg';
+  const buttonGapClass = compactView ? 'gap-1' : 'gap-2';
 
   return (
     <div className="flex flex-col h-screen bg-slate-900 text-slate-100 font-sans pb-[280px]">
@@ -239,6 +245,14 @@ const GameBuffSession = ({ initialLoadout }) => {
         <div><h2 className="text-xs text-slate-400 uppercase tracking-widest">Current Game</h2><h1 className="text-xl font-bold text-white">{loadout.game_title}</h1></div>
         <div className={`text-2xl font-mono font-bold ${isActive ? 'text-green-400' : 'text-slate-500'}`}>{formatTime(seconds)}</div>
       </div>
+      <div className="flex justify-between px-4 pt-3 pb-1">
+        <button
+          onClick={() => setCompactView(!compactView)}
+          className="text-[11px] uppercase tracking-wider rounded-full px-3 py-1 border border-slate-700 text-slate-400 hover:text-white transition"
+        >
+          {compactView ? 'Regular' : 'Compact'}
+        </button>
+      </div>
       <div className="px-4">
         {log[0] && (
           <p className="text-xs text-slate-400 mb-2">Latest: {log[0].message}</p>
@@ -247,19 +261,21 @@ const GameBuffSession = ({ initialLoadout }) => {
       <div className="flex-1 overflow-hidden px-4">
         <div className="h-full overflow-y-auto space-y-4 pb-6 pt-2">
           {buttonItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={item.onClick}
-              className={`w-full rounded-3xl border border-slate-800 shadow-2xl shadow-black/40 transform transition active:scale-95 flex flex-col justify-center gap-2 px-6 ${
-                item.variant === 'trigger'
-                  ? `py-8 ${item.color} text-white`
-                  : 'py-10 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white'
-              }`}
-            >
-              <p className="text-3xl font-black uppercase tracking-[0.25em]">{item.title}</p>
-              <p className="text-lg font-semibold">{item.subtitle}</p>
-              {item.detail && <p className="text-sm font-semibold text-amber-300">{item.detail}</p>}
-            </button>
+              <button
+                key={item.id}
+                onClick={item.onClick}
+                className={`w-full rounded-3xl border border-slate-800 shadow-2xl shadow-black/40 transform transition active:scale-95 flex flex-col items-center justify-center ${buttonGapClass} px-6 text-center ${
+                  item.variant === 'trigger'
+              ? `${buttonPaddingClass} ${item.color} text-white`
+              : `${buttonPaddingClass} bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white`
+                }`}
+              >
+                <p className={`${titleSizeClass} font-black uppercase ${titleTrackingClass}`}>{item.title}</p>
+                <div className={`flex items-center justify-center gap-3 font-semibold ${subtitleSizeClass}`}>
+                  <span>{item.subtitle}</span>
+                  {item.detail && <span className="text-sm font-semibold text-amber-300">{item.detail}</span>}
+                </div>
+              </button>
           ))}
         </div>
       </div>
