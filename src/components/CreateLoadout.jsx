@@ -22,6 +22,9 @@ const CreateLoadout = () => {
     { id: 1, label: '', exercise: 'Pushups', amount: 10, type: 'reps', color: 'bg-red-600' }
   ]);
   const [baseExercises, setBaseExercises] = useState(() => buildBaseExerciseState());
+  const [newExerciseName, setNewExerciseName] = useState('');
+  const [newExerciseReps, setNewExerciseReps] = useState(10);
+  const [newExerciseWeight, setNewExerciseWeight] = useState('');
 
   // Load existing data if editing
   useEffect(() => {
@@ -65,7 +68,7 @@ const CreateLoadout = () => {
     { name: 'Purple', value: 'bg-purple-600' },
     { name: 'Orange', value: 'bg-orange-600' },
   ];
-  const commonExercises = baseExerciseBlueprint.map((exercise) => exercise.name);
+  const commonExercises = baseExercises.map((exercise) => exercise.name);
   const TIMER_KEYWORDS = ['plank', 'hold', 'wall sit', 'stretch', 'hang'];
 
   const addTrigger = () => {
@@ -112,6 +115,39 @@ const CreateLoadout = () => {
           : exercise
       )
     );
+  };
+
+  const removeBaseExercise = (exerciseName) => {
+    setBaseExercises((prev) => prev.filter((exercise) => exercise.name !== exerciseName));
+  };
+
+  const handleAddCustomExercise = () => {
+    const name = newExerciseName.trim();
+    if (!name) {
+      alert('Enter an exercise name.');
+      return;
+    }
+    if (baseExercises.some((exercise) => exercise.name.toLowerCase() === name.toLowerCase())) {
+      alert('That exercise is already added.');
+      return;
+    }
+    const reps = Number(newExerciseReps);
+    if (Number.isNaN(reps) || reps < 0) {
+      alert('Enter a valid reps number.');
+      return;
+    }
+    const weightValue = newExerciseWeight ? Number(newExerciseWeight) : undefined;
+    setBaseExercises((prev) => [
+      ...prev,
+      {
+        name,
+        reps,
+        weight: weightValue,
+      },
+    ]);
+    setNewExerciseName('');
+    setNewExerciseReps(10);
+    setNewExerciseWeight('');
   };
 
   const handleSave = async () => {
@@ -204,6 +240,46 @@ const CreateLoadout = () => {
           >
             {showMedia ? 'Hide animations' : 'Show animations'}
           </button>
+      </div>
+    </div>
+
+      <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 mb-6 space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-wider text-slate-400">Custom exercise</p>
+            <p className="text-sm text-slate-500">Add any move you want and it appears in the trigger dropdown.</p>
+          </div>
+          <button
+            onClick={handleAddCustomExercise}
+            className="text-xs uppercase tracking-wide bg-blue-600 hover:bg-blue-500 px-3 py-1 rounded-full"
+          >
+            Add
+          </button>
+        </div>
+        <div className="grid gap-3 md:grid-cols-3">
+          <input
+            type="text"
+            value={newExerciseName}
+            onChange={(e) => setNewExerciseName(e.target.value)}
+            placeholder="Exercise name"
+            className="col-span-full md:col-auto bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"
+          />
+          <input
+            type="number"
+            min="0"
+            value={newExerciseReps}
+            onChange={(e) => setNewExerciseReps(e.target.value)}
+            placeholder="Reps"
+            className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"
+          />
+          <input
+            type="number"
+            min="0"
+            value={newExerciseWeight}
+            onChange={(e) => setNewExerciseWeight(e.target.value)}
+            placeholder="Weight (optional)"
+            className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"
+          />
         </div>
       </div>
 
@@ -230,21 +306,20 @@ const CreateLoadout = () => {
                 onClick={() => setVisibility(option)}
                 className={`flex-1 py-2 rounded-lg border text-sm font-semibold ${visibility === option ? 'border-blue-500 text-white' : 'border-slate-700 text-slate-400'}`}
               >
-                {option === 'private' ? 'Private' : 'Share with Community'}
+                {option === 'private' ? 'Private' : 'Public'}
               </button>
             ))}
           </div>
           <p className="text-[11px] text-slate-500 flex items-start gap-2">
             <Share2 size={12} className="mt-0.5 text-blue-400" />
-            Public loadouts appear in Community and can be copied by others. Private stays yours.
+            Public loadouts appear in Community and can be copied by others.
           </p>
         </div>
       </div>
       <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-slate-700 rounded-2xl p-5 mb-6 shadow-2xl shadow-slate-900/40">
         <div className="flex flex-col gap-1 mb-4">
-          <p className="text-xs uppercase tracking-wider text-slate-400">Freeform Defaults</p>
           <h2 className="text-xl font-bold text-white">Base exercises</h2>
-          <p className="text-sm text-slate-400">Set rep goals for each preset exercise before building triggers on top.</p>
+          <p className="text-sm text-slate-400">Set rep goals for each exercise.</p>
         </div>
         <div className="grid gap-4 md:grid-cols-3">
           {baseExercises.map((exercise) => {
@@ -252,7 +327,15 @@ const CreateLoadout = () => {
             return (
               <div key={exercise.name} className="bg-slate-900/70 border border-slate-800 rounded-xl p-4 flex flex-col gap-3">
               <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-semibold text-white">{exercise.name}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-semibold text-white">{exercise.name}</p>
+                  <button
+                    onClick={() => removeBaseExercise(exercise.name)}
+                    className="text-[11px] text-red-400 hover:text-red-300 px-2 py-0.5 rounded bg-red-500/10 border border-transparent"
+                  >
+                    Remove
+                  </button>
+                </div>
                 <div className="flex items-center gap-1 bg-slate-900 border border-slate-700 rounded-full px-2">
                   <button
                     type="button"
@@ -324,15 +407,6 @@ const CreateLoadout = () => {
                   <input type="number" value={trigger.amount} onChange={(e) => updateTrigger(trigger.id, 'amount', parseInt(e.target.value) || 0)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-center transition-colors" />
                 </div>
               </div>
-              {showMedia && getExerciseMedia(trigger.exercise) && (
-                <div className="flex items-center gap-2 text-xs text-slate-300">
-                  <span className="relative w-8 h-8 rounded-full overflow-hidden border border-white/10">
-                    <span className="absolute inset-0 bg-gradient-to-br from-emerald-400/70 via-sky-400/70 to-purple-500/70 animate-[spin_3s_linear_infinite] opacity-70" />
-                    <span className="absolute inset-1 bg-slate-900/70 rounded-full" />
-                  </span>
-                  <span>Animated cue preview</span>
-                </div>
-              )}
               <div>
                 <label className="text-xs text-slate-500 mb-2 block">Color</label>
                 <div className="flex gap-2">
