@@ -79,7 +79,6 @@ const CreateLoadout = () => {
   };
 
   const removeTrigger = (triggerId) => {
-    if (triggers.length === 1) return;
     setTriggers(triggers.filter(t => t.id !== triggerId));
   };
 
