@@ -252,7 +252,7 @@ const Game = () => {
   const recentSessions = filteredSessions.slice(0, 5);
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 p-4 font-sans pb-48 safe-area-pb">
+    <div className="min-h-screen bg-slate-900 text-slate-100 p-4 font-sans pb-64 safe-area-pb">
       <div className="flex items-center gap-3 mb-6">
         <button
           onClick={() => navigate('/dashboard')}
