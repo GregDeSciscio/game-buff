@@ -160,11 +160,11 @@ const Explore = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 p-4 font-sans pb-32 safe-area-pb">
-      <div className="flex items-center gap-3 mb-4">
+    <main className="page-shell min-h-screen p-4 pb-32 text-slate-100 safe-area-pb">
+      <div className="screen-header">
         <div className="flex items-center gap-2">
-          <Sparkles className="text-purple-300" size={22} />
-          <h1 className="text-xl font-bold">Explore Loadouts</h1>
+          <Sparkles className="text-violet-300" size={22} />
+          <div><p className="eyebrow">Community library</p><h1 className="screen-title">Discover loadouts</h1></div>
         </div>
       </div>
 
@@ -179,16 +179,16 @@ const Explore = () => {
             className="flex-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-white outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        <div className="flex gap-2">
+        <div className="segmented-control">
           <button
             onClick={() => setTab('presets')}
-            className={`flex-1 py-2 rounded-lg text-sm ${tab === 'presets' ? 'bg-slate-700 text-white' : 'text-slate-400'}`}
+            className={`flex-1 text-sm font-semibold ${tab === 'presets' ? 'bg-violet-500/20 text-white' : 'text-slate-400'}`}
           >
             <Sparkles size={14} className="inline mr-1" /> Presets
           </button>
           <button
             onClick={() => setTab('community')}
-            className={`flex-1 py-2 rounded-lg text-sm ${tab === 'community' ? 'bg-slate-700 text-white' : 'text-slate-400'}`}
+            className={`flex-1 text-sm font-semibold ${tab === 'community' ? 'bg-violet-500/20 text-white' : 'text-slate-400'}`}
           >
             <Globe2 size={14} className="inline mr-1" /> Community
           </button>
@@ -198,7 +198,7 @@ const Explore = () => {
       {tab === 'presets' ? renderList(presets, 'preset') : renderList(community, 'community')}
 
       <BottomNav />
-    </div>
+    </main>
   );
 };
 

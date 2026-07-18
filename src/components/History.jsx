@@ -95,14 +95,14 @@ const History = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 p-4 font-sans pb-32 safe-area-pb">
+    <main className="page-shell min-h-screen p-4 pb-32 text-slate-100 safe-area-pb">
       
       {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
-        <button onClick={() => navigate('/dashboard')} className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white">
-          <ArrowLeft size={24} />
+      <div className="screen-header">
+        <button onClick={() => navigate('/dashboard')} className="icon-button" aria-label="Back to arena">
+          <ArrowLeft size={20} />
         </button>
-        <h1 className="text-xl font-bold">Session History</h1>
+        <div><p className="eyebrow">Your progress</p><h1 className="screen-title">Session activity</h1></div>
       </div>
 
       {loading ? (
@@ -165,7 +165,7 @@ const History = () => {
           </div>
       )}
       <BottomNav />
-    </div>
+    </main>
   );
 };
 

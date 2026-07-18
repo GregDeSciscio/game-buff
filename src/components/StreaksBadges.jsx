@@ -52,28 +52,28 @@ const StreaksBadges = () => {
   if (loading) return <div className="text-sm text-slate-400">Loading streaks...</div>;
 
   return (
-    <div className="bg-slate-800 border border-slate-700 rounded-xl p-3 space-y-3">
+    <div className="glass-panel rounded-2xl p-5 space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-orange-300">
           <Flame size={16} />
           <div>
-            <p className="text-xs text-slate-400">Current Streak</p>
-            <p className="text-lg font-bold text-white">{currentStreak} days</p>
+            <p className="eyebrow">Current streak</p>
+            <p className="text-2xl font-bold text-white">{currentStreak}<span className="ml-1 text-sm font-medium text-slate-400">days</span></p>
           </div>
         </div>
         <div className="text-right">
-          <p className="text-xs text-slate-400">Longest</p>
+          <p className="eyebrow">Best run</p>
           <p className="text-sm font-semibold text-white">{longestStreak} days</p>
         </div>
       </div>
 
-      <div className="flex items-center gap-2 text-slate-300 text-xs">
+      <div className="flex items-center gap-2 rounded-xl border border-white/5 bg-slate-950/25 p-2.5 text-slate-300 text-xs">
         <Target size={14} className="text-blue-400" />
         <span>Keep your streak by completing at least one session today.</span>
       </div>
 
       <div>
-        <div className="text-xs uppercase text-slate-400 mb-2">Badges</div>
+        <div className="eyebrow mb-2">Badge shelf</div>
         {badges.length === 0 ? (
           <p className="text-xs text-slate-500">No badges earned yet.</p>
         ) : (

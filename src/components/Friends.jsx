@@ -238,26 +238,27 @@ const Friends = () => {
   );
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 p-4 font-sans pb-32 safe-area-pb">
-      <div className="flex items-center gap-3 mb-6">
+    <main className="page-shell min-h-screen p-4 pb-32 text-slate-100 safe-area-pb">
+      <div className="screen-header">
         <button
           onClick={() => navigate('/dashboard')}
-          className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white"
+          className="icon-button"
+          aria-label="Back to arena"
         >
           <ArrowLeft size={22} />
         </button>
         <div className="flex items-center gap-2">
-          <Users className="text-blue-400" size={22} />
-          <h1 className="text-xl font-bold">Friends</h1>
+          <Users className="text-violet-300" size={22} />
+          <div><p className="eyebrow">Your squad</p><h1 className="screen-title">Friends</h1></div>
         </div>
       </div>
 
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-2 mb-4 flex">
+      <div className="segmented-control mb-4">
         {tabOptions.map((opt) => (
           <button
             key={opt.id}
             onClick={() => setActiveTab(opt.id)}
-            className={`flex-1 py-2 rounded-lg text-sm ${activeTab === opt.id ? 'bg-slate-700 text-white' : 'text-slate-400'}`}
+            className={`flex-1 text-sm font-semibold ${activeTab === opt.id ? 'bg-violet-500/20 text-white' : 'text-slate-400'}`}
           >
             {opt.label}
           </button>
@@ -316,7 +317,7 @@ const Friends = () => {
         )}
       </div>
       <BottomNav />
-    </div>
+    </main>
   );
 };
 

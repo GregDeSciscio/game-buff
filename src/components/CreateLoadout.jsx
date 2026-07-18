@@ -26,6 +26,7 @@ const CreateLoadout = () => {
   const [newExerciseReps, setNewExerciseReps] = useState(10);
   const [newExerciseWeight, setNewExerciseWeight] = useState('');
   const [showCustomCard, setShowCustomCard] = useState(false);
+  const [step, setStep] = useState(1);
 
   // Load existing data if editing
   useEffect(() => {
@@ -229,29 +230,44 @@ const CreateLoadout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 p-4 pb-72 font-sans safe-area-pb">
+    <main className="page-shell min-h-screen pb-40 text-slate-100 safe-area-pb">
+      <div className="app-container max-w-4xl px-4 py-5 sm:px-6 sm:py-8">
 
       {/* Header */}
-      <div className="mb-8 flex items-center gap-3">
-        <button onClick={() => navigate('/dashboard')} className="p-2 bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
+      <div className="screen-header">
+        <button onClick={() => navigate('/dashboard')} className="icon-button" aria-label="Back to arena">
             <ArrowLeft size={20} />
         </button>
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-          <Gamepad2 className="text-blue-400" /> {id ? 'Edit Loadout' : 'New Loadout'}
-        </h1>
+        <div className="flex-1"><p className="eyebrow">Loadout builder</p><h1 className="screen-title">{id ? 'Tune your loadout' : 'Build a new loadout'}</h1></div>
         <div className="ml-auto">
           <button
             onClick={() => setShowMedia(!showMedia)}
-            className="text-[11px] text-slate-400 hover:text-white px-3 py-1 border border-slate-700 rounded-full"
+            className="min-h-11 rounded-xl border border-white/10 bg-slate-800/70 px-3 text-xs font-semibold text-slate-300 hover:text-white"
           >
             {showMedia ? 'Hide animations' : 'Show animations'}
           </button>
       </div>
     </div>
 
-      <div className="mb-6">
-        <label className="block text-xs uppercase tracking-wider text-slate-400 mb-2">Game Name</label>
-        <input type="text" value={gameTitle} onChange={(e) => setGameTitle(e.target.value)} placeholder="e.g. Call of Duty" className="w-full bg-slate-800 border border-slate-700 text-white rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all" />
+      <div className="mb-6 grid grid-cols-3 gap-2" aria-label="Loadout setup progress">
+        {[
+          { number: 1, label: 'Game' },
+          { number: 2, label: 'Workout' },
+          { number: 3, label: 'Triggers' },
+        ].map((item) => (
+          <button key={item.number} type="button" onClick={() => setStep(item.number)} aria-current={step === item.number ? 'step' : undefined}
+            className={`min-h-12 rounded-xl border px-2 text-sm font-bold transition ${step === item.number ? 'border-violet-300/40 bg-violet-500/15 text-white' : item.number < step ? 'border-emerald-300/20 bg-emerald-400/5 text-emerald-200' : 'border-white/10 bg-slate-900/40 text-slate-500'}`}>
+            <span className="mr-1 font-mono text-xs">0{item.number}</span> {item.label}
+          </button>
+        ))}
+      </div>
+
+      <section className={step === 1 ? 'block' : 'hidden'} aria-label="Game details">
+
+      <div className="surface-card mb-4 p-5">
+        <p className="eyebrow">Step 1</p><h2 className="mt-1 text-xl font-extrabold text-white">Choose your game</h2><p className="mb-5 mt-1 text-sm text-slate-400">This becomes the name of your workout command center.</p>
+        <label className="eyebrow mb-2 block" htmlFor="game-title">Game name</label>
+        <input id="game-title" type="text" value={gameTitle} onChange={(e) => setGameTitle(e.target.value)} placeholder="e.g. Call of Duty" className="field-control" />
         {id && loadoutOwnerId && currentUserId && loadoutOwnerId !== currentUserId && (
           <p className="text-[11px] text-red-400 mt-1">You cannot edit or delete this loadout because it belongs to another user.</p>
         )}
@@ -261,16 +277,16 @@ const CreateLoadout = () => {
       </div>
 
       <div className="mb-4">
-        <div className="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 space-y-3">
+        <div className="surface-card space-y-3 p-5">
           <div>
             <p className="text-xs uppercase tracking-wider text-slate-400">Visibility</p>
           </div>
-          <div className="flex gap-2">
+          <div className="segmented-control">
             {['private', 'public'].map((option) => (
               <button
                 key={option}
                 onClick={() => setVisibility(option)}
-                className={`flex-1 py-2 rounded-lg border text-sm font-semibold ${visibility === option ? 'border-blue-500 text-white' : 'border-slate-700 text-slate-400'}`}
+                className={`flex-1 text-sm font-semibold ${visibility === option ? 'bg-violet-500/20 text-white' : 'text-slate-400'}`}
               >
                 {option === 'private' ? 'Private' : 'Public'}
               </button>
@@ -282,12 +298,16 @@ const CreateLoadout = () => {
           </p>
         </div>
       </div>
-      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-slate-700 rounded-2xl p-5 mb-6 shadow-2xl shadow-slate-900/40">
+      {id && <button type="button" onClick={handleDelete} disabled={deleting} className="mt-2 min-h-11 text-sm font-semibold text-red-300 hover:text-red-200 disabled:opacity-50">{deleting ? 'Deleting…' : 'Delete this loadout'}</button>}
+      </section>
+
+      <section className={step === 2 ? 'block' : 'hidden'} aria-label="Base workout">
+      <div className="surface-card mb-6 p-5">
         <div className="flex flex-col gap-1 mb-4">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <h2 className="text-xl font-bold text-white">Base Workout</h2>
-              <p className="text-sm text-slate-400">Set rep goals for each exercise.</p>
+              <p className="eyebrow">Step 2</p><h2 className="mt-1 text-xl font-extrabold text-white">Set your base workout</h2>
+              <p className="text-sm text-slate-400">These moves are always available during a session.</p>
             </div>
             <button
               type="button"
@@ -419,36 +439,40 @@ const CreateLoadout = () => {
         )}
       </div>
 
+      </section>
+      <section className={step === 3 ? 'block' : 'hidden'} aria-label="Game triggers">
+
       <div className="space-y-6 pb-32">
         <div className="flex flex-col gap-1">
-          <p className="text-xs uppercase tracking-wider text-slate-400">Triggers</p>
-          <p className="text-[11px] text-slate-500">Use triggers to turn specific moments into rep or timer bursts on top of the base exercises.</p>
+          <p className="eyebrow">Step 3</p><h2 className="text-xl font-extrabold text-white">Connect game moments to movement</h2>
+          <p className="text-sm text-slate-400">Each rule becomes one large button in your live session.</p>
         </div>
         {triggers.map((trigger) => (
-          <div key={trigger.id} className="bg-slate-800 p-4 rounded-xl border border-slate-700 relative animate-fade-in-down">
-            <button onClick={() => removeTrigger(trigger.id)} className="absolute top-2 right-2 text-slate-500 hover:text-red-400 p-2 transition-colors"><Trash2 size={16} /></button>
+          <div key={trigger.id} className="surface-card relative p-5 animate-fade-in-down">
+            <button onClick={() => removeTrigger(trigger.id)} className="absolute right-3 top-3 grid h-11 w-11 place-items-center rounded-xl text-slate-400 hover:bg-red-500/10 hover:text-red-300" aria-label="Remove trigger"><Trash2 size={17} /></button>
             <div className="space-y-4">
+              <p className="mr-12 rounded-xl border border-violet-300/10 bg-violet-500/5 px-3 py-2 text-sm text-violet-100">When <strong>{trigger.label || 'this happens'}</strong>, do <strong>{trigger.amount} {trigger.exercise}</strong>.</p>
               <div>
-                <label className="text-xs text-slate-500 mb-1 block">Trigger</label>
-                <input type="text" placeholder="e.g. Died" value={trigger.label} onChange={(e) => updateTrigger(trigger.id, 'label', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm outline-none focus:border-blue-500 transition-colors" />
+                <label className="eyebrow mb-2 block">When this happens</label>
+                <input type="text" placeholder="e.g. I die" value={trigger.label} onChange={(e) => updateTrigger(trigger.id, 'label', e.target.value)} className="field-control" />
               </div>
               <div className="flex gap-3">
                 <div className="flex-1">
-                  <label className="text-xs text-slate-500 mb-1 block">Do this</label>
-                  <select value={trigger.exercise} onChange={(e) => updateTrigger(trigger.id, 'exercise', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm transition-colors">
+                  <label className="eyebrow mb-2 block">Do this</label>
+                  <select value={trigger.exercise} onChange={(e) => updateTrigger(trigger.id, 'exercise', e.target.value)} className="field-control">
                     {commonExercises.map(ex => <option key={ex} value={ex}>{ex}</option>)}
                   </select>
                 </div>
                 <div className="w-20">
-                  <label className="text-xs text-slate-500 mb-1 block">{trigger.type === 'timer' ? 'Secs' : 'Reps'}</label>
-                  <input type="number" value={trigger.amount} onChange={(e) => updateTrigger(trigger.id, 'amount', parseInt(e.target.value) || 0)} className="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-center transition-colors" />
+                  <label className="eyebrow mb-2 block">{trigger.type === 'timer' ? 'Secs' : 'Reps'}</label>
+                  <input type="number" value={trigger.amount} onChange={(e) => updateTrigger(trigger.id, 'amount', parseInt(e.target.value) || 0)} className="field-control px-2 text-center" />
                 </div>
               </div>
               <div>
-                <label className="text-xs text-slate-500 mb-2 block">Color</label>
-                <div className="flex gap-2">
+                <label className="eyebrow mb-2 block">Session button color</label>
+                <div className="flex flex-wrap gap-2">
                   {colorOptions.map((color) => (
-                    <button key={color.value} onClick={() => updateTrigger(trigger.id, 'color', color.value)} className={`w-8 h-8 rounded-full ${color.value} ${trigger.color === color.value ? 'ring-2 ring-white ring-offset-2 ring-offset-slate-800' : 'opacity-50'} transition-all`} />
+                    <button key={color.value} type="button" aria-label={`${color.name} button color`} aria-pressed={trigger.color === color.value} onClick={() => updateTrigger(trigger.id, 'color', color.value)} className={`min-h-11 rounded-xl px-3 text-xs font-bold text-white ${color.value} ${trigger.color === color.value ? 'ring-2 ring-white ring-offset-2 ring-offset-slate-900' : 'opacity-55'} transition-all`}>{color.name}</button>
                   ))}
                 </div>
               </div>
@@ -457,25 +481,23 @@ const CreateLoadout = () => {
         ))}
         <button onClick={addTrigger} className="w-full py-3 border-2 border-dashed border-slate-700 text-slate-400 rounded-xl flex items-center justify-center gap-2 hover:bg-slate-800 hover:text-white transition-colors"><Plus size={18} /> Add Trigger</button>
       </div>
+      </section>
+      </div>
 
-      <div className="fixed left-0 right-0 bottom-16 p-4 bg-slate-900/90 backdrop-blur border-t border-slate-800 safe-area-pb">
-        <div className="flex items-center gap-3">
-          {id && (
-            <button
-              onClick={handleDelete}
-              disabled={deleting}
-              className="flex-1 py-3 border border-red-600 text-red-300 hover:bg-red-600 hover:text-white rounded-lg text-sm font-semibold disabled:opacity-50 transition"
-            >
-              {deleting ? 'Deleting...' : 'Delete Loadout'}
+      <div className="fixed bottom-16 left-0 right-0 z-30 border-t border-white/10 bg-[#090e19]/92 p-3 backdrop-blur-xl safe-area-pb">
+        <div className="mx-auto flex max-w-4xl items-center gap-3">
+          {step > 1 && <button type="button" onClick={() => setStep((value) => value - 1)} className="min-h-12 flex-1 rounded-xl border border-white/10 bg-slate-800 px-4 font-bold text-slate-200">Back</button>}
+          {step < 3 ? (
+            <button type="button" onClick={() => setStep((value) => value + 1)} disabled={step === 1 && !gameTitle.trim()} className="neon-button min-h-12 flex-[2] rounded-xl px-4 font-bold disabled:cursor-not-allowed disabled:opacity-40">Continue to {step === 1 ? 'workout' : 'triggers'}</button>
+          ) : (
+            <button onClick={handleSave} disabled={loading} className="neon-button min-h-12 flex-[2] rounded-xl px-4 font-bold disabled:opacity-50">
+              {loading ? 'Saving…' : <><Save size={18} /> {id ? 'Update loadout' : 'Save loadout'}</>}
             </button>
           )}
-          <button onClick={handleSave} disabled={loading} className="flex-1 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg flex items-center justify-center gap-2 shadow-lg shadow-blue-900/20 disabled:opacity-50 transition-all">
-             {loading ? 'Saving...' : <><Save size={18} /> {id ? 'Update Loadout' : 'Save Loadout'}</>}
-          </button>
         </div>
       </div>
       <BottomNav />
-    </div>
+    </main>
   );
 };
 

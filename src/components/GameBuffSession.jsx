@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
-import { Play, Pause, X, RotateCcw } from 'lucide-react';
+import { Play, Pause, X, RotateCcw, Undo2, Flame, Zap } from 'lucide-react';
 import { calculateXP, getLevelProgress } from '../utilities/gameLogic';
 import { calculateCalories } from '../utilities/calories';
-import BottomNav from './BottomNav';
 import { playClick, playTimerComplete } from '../utilities/sounds';
 import { buildBaseExerciseState } from '../utilities/baseExercises';
 
@@ -59,8 +58,7 @@ const GameBuffSession = ({ initialLoadout }) => {
   const [burst, setBurst] = useState(false);
   const [levelPulse, setLevelPulse] = useState(false);
   const [unlockedBadges, setUnlockedBadges] = useState([]);
-  const [compactView, setCompactView] = useState(true);
-  const [triggersFirst, setTriggersFirst] = useState(true);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
   const badgeLabels = {
     sessions_10: '10 Sessions',
     sessions_25: '25 Sessions',
@@ -161,6 +159,21 @@ const GameBuffSession = ({ initialLoadout }) => {
     setActiveTimerTrigger(null);
   };
 
+  const handleUndo = () => {
+    const latest = log[0];
+    if (!latest) return;
+    playClick();
+    setSessionXP((value) => Math.max(0, value - (latest.xp || 0)));
+    setSessionCalories((value) => Math.max(0, value - (latest.calories || 0)));
+    setTotalReps((value) => Math.max(0, value - (latest.amount || 0)));
+    setLog((entries) => entries.slice(1));
+  };
+
+  const leaveWithoutSaving = () => {
+    playClick();
+    navigate(`/game/${loadout.id}`, { state: { loadout } });
+  };
+
   const handleEndSession = async () => {
     playClick();
     setIsSaving(true);
@@ -214,15 +227,10 @@ const GameBuffSession = ({ initialLoadout }) => {
     onClick: () => handleTrigger(trigger),
     variant: 'trigger',
   }));
-  const buttonItems = triggersFirst ? [...triggerButtons, ...baseButtons] : [...baseButtons, ...triggerButtons];
-  const buttonPaddingClass = compactView ? 'py-1' : 'py-4';
-  const titleSizeClass = compactView ? 'text-xl' : 'text-3xl';
-  const titleTrackingClass = compactView ? 'tracking-[0.1em]' : 'tracking-[0.25em]';
-  const subtitleSizeClass = compactView ? 'text-base' : 'text-lg';
-  const buttonGapClass = compactView ? 'gap-1' : 'gap-2';
+  const buttonItems = [...triggerButtons, ...baseButtons];
 
   return (
-    <div className="flex flex-col h-screen bg-slate-900 text-slate-100 font-sans pb-[280px]">
+    <main className="page-shell flex h-screen flex-col overflow-hidden pb-[218px] text-slate-100">
       {hasTimerTriggers && activeTimerTrigger && (
         <TimerModal trigger={activeTimerTrigger} onComplete={logSuccess} onCancel={() => setActiveTimerTrigger(null)} />
       )}
@@ -240,110 +248,92 @@ const GameBuffSession = ({ initialLoadout }) => {
           </div>
         </div>
       )}
-      
-      <div className="flex justify-between items-center p-4 bg-slate-800 border-b border-slate-700 shadow-md">
-        <div><h2 className="text-xs text-slate-400 uppercase tracking-widest">Current Game</h2><h1 className="text-xl font-bold text-white">{loadout.game_title}</h1></div>
-        <div className={`text-2xl font-mono font-bold ${isActive ? 'text-green-400' : 'text-slate-500'}`}>{formatTime(seconds)}</div>
-      </div>
-      <div className="px-4 pt-4">
-        <p className="text-sm text-slate-300">Complete your reps and push the buttons to log your activity.</p>
-      </div>
-      <div className="flex justify-between px-4 pt-3 pb-1">
-        <div className="flex gap-2">
-          <button
-            onClick={() => setCompactView(!compactView)}
-            className="text-[11px] uppercase tracking-wider rounded-full px-3 py-1 border border-slate-700 text-slate-400 hover:text-white transition"
-          >
-            {compactView ? 'Relaxed' : 'Compact'}
-          </button>
-          <button
-            onClick={() => setTriggersFirst((prev) => !prev)}
-            className="text-[11px] uppercase tracking-wider rounded-full px-3 py-1 border border-slate-700 text-slate-400 hover:text-white transition"
-          >
-            {triggersFirst ? 'Triggers First' : 'Triggers Last'}
-          </button>
+      {showExitConfirm && (
+        <div className="fixed inset-0 z-50 grid place-items-end bg-black/70 p-4 backdrop-blur-sm sm:place-items-center">
+          <div className="surface-card w-full max-w-md p-5">
+            <p className="eyebrow">Leave the arena?</p>
+            <h2 className="mt-2 text-2xl font-extrabold text-white">This session will not be saved.</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-400">Your {totalReps} logged reps and {sessionXP} XP will be discarded.</p>
+            <div className="mt-5 grid grid-cols-2 gap-3">
+              <button type="button" onClick={() => setShowExitConfirm(false)} className="min-h-12 rounded-xl border border-white/10 bg-slate-800 px-4 font-bold text-white">Keep training</button>
+              <button type="button" onClick={leaveWithoutSaving} className="min-h-12 rounded-xl border border-red-400/30 bg-red-500/15 px-4 font-bold text-red-200">Leave session</button>
+            </div>
+          </div>
         </div>
+      )}
+
+      <header className="relative flex items-center justify-between border-b border-white/10 bg-[#0b1120]/85 px-4 py-4 backdrop-blur-xl">
+        <button type="button" onClick={() => log.length ? setShowExitConfirm(true) : leaveWithoutSaving()} className="icon-button" aria-label="Exit session"><X size={19} /></button>
+        <div className="min-w-0 flex-1 px-3"><p className="eyebrow">Live session</p><h1 className="truncate text-lg font-extrabold text-white">{loadout.game_title}</h1></div>
+        <div className={`rounded-xl border px-3 py-2 font-mono text-lg font-bold ${isActive ? 'border-emerald-300/25 bg-emerald-400/10 text-emerald-300' : 'border-white/10 bg-white/5 text-slate-400'}`}>{formatTime(seconds)}</div>
+      </header>
+
+      <div className="relative flex items-center justify-between gap-3 px-4 pb-2 pt-4">
+        <div><p className="eyebrow">Tap what happened</p><p className="mt-1 text-sm text-slate-400">Your first tap starts the clock.</p></div>
+        {log[0] && <button type="button" onClick={handleUndo} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/10 bg-slate-800/80 px-3 text-sm font-bold text-slate-200"><Undo2 size={16} /> Undo</button>}
       </div>
-      <div className="px-4">
-        {log[0] && (
-          <p className="text-xs text-slate-400 mb-2">Latest: {log[0].message}</p>
-        )}
-      </div>
-      <div className="flex-1 overflow-hidden px-4">
-        <div className="h-full overflow-y-auto space-y-4 pb-6 pt-2">
+      {log[0] && <p className="relative mx-4 mb-1 truncate rounded-lg bg-emerald-400/5 px-3 py-2 text-xs text-emerald-200">Latest · {log[0].message}</p>}
+      <div className="relative flex-1 overflow-hidden px-4">
+        <div className="grid h-full grid-cols-2 gap-3 overflow-y-auto pb-6 pt-2 md:grid-cols-3">
           {buttonItems.map((item) => (
               <button
                 key={item.id}
                 onClick={item.onClick}
-                className={`w-full rounded-3xl border border-slate-800 shadow-2xl shadow-black/40 transform transition active:scale-95 flex flex-col items-center justify-center ${buttonGapClass} px-6 text-center ${
+                className={`flex min-h-[112px] w-full transform flex-col items-center justify-center gap-1 rounded-2xl border px-3 py-4 text-center shadow-xl shadow-black/25 transition active:scale-95 ${
                   item.variant === 'trigger'
-              ? `${buttonPaddingClass} ${item.color} text-white`
-              : `${buttonPaddingClass} bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white`
+              ? `${item.color} border-white/15 text-white`
+              : 'border-white/10 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white'
                 }`}
               >
-                <p className={`${titleSizeClass} font-black uppercase ${titleTrackingClass}`}>{item.title}</p>
-                <div className={`flex items-center justify-center gap-3 font-semibold ${subtitleSizeClass}`}>
+                <p className="text-lg font-black uppercase tracking-wide">{item.title}</p>
+                <div className="flex flex-col items-center justify-center gap-1 text-sm font-semibold text-white/80">
                   <span>{item.subtitle}</span>
-                  {item.detail && <span className="text-sm font-semibold text-amber-300">{item.detail}</span>}
+                  {item.detail && <span className="text-xs font-semibold text-amber-200">{item.detail}</span>}
                 </div>
               </button>
           ))}
         </div>
       </div>
 
-      <div className="fixed inset-x-0 bottom-16 px-4 pb-4">
-        <div className="rounded-2xl bg-slate-900/90 border border-slate-700 p-4 shadow-2xl">
-          <div className="flex items-center gap-4 mb-3">
-            <div className="flex-1">
-              <p className="text-[11px] uppercase tracking-wide text-slate-400">Level</p>
-              <p className="text-sm text-white font-semibold">
-                LEVEL {currentLevel} ({Math.floor(currentXP)} / {neededXP} XP)
-              </p>
-            </div>
-            <div className="flex-1 text-right">
-              <p className="text-[11px] uppercase tracking-wide text-slate-400">Total Reps</p>
-              <p className="text-lg font-bold text-blue-400">{totalReps}</p>
-            </div>
+      <div className="fixed inset-x-0 bottom-0 z-30 p-3 safe-area-pb">
+        <div className="surface-card mx-auto max-w-2xl p-3 shadow-2xl shadow-black/50">
+          <div className="mb-3 grid grid-cols-3 gap-2">
+            <div className="rounded-xl bg-white/5 px-3 py-2"><p className="eyebrow">XP</p><p className="mt-1 flex items-center gap-1 text-lg font-extrabold text-violet-200"><Zap size={15} /> {sessionXP}</p></div>
+            <div className="rounded-xl bg-white/5 px-3 py-2"><p className="eyebrow">Reps</p><p className="mt-1 text-lg font-extrabold text-cyan-200">{totalReps}</p></div>
+            <div className="rounded-xl bg-white/5 px-3 py-2"><p className="eyebrow">Energy</p><p className="mt-1 flex items-center gap-1 text-lg font-extrabold text-amber-200"><Flame size={15} /> {Math.round(sessionCalories)}</p></div>
+          </div>
+          <div className="mb-3 flex items-center gap-3">
+            <div className="flex-1"><div className="mb-1 flex justify-between text-xs text-slate-400"><span>Level {currentLevel}</span><span>{Math.floor(currentXP)} / {neededXP} XP</span></div><div className="progress-track h-2 rounded-full"><div className={`progress-fill h-full rounded-full transition-all ${levelPulse ? 'animate-pulse' : ''}`} style={{ width: `${progressPercent}%` }} /></div></div>
             {hasTimerTriggers && (
               <button
                 onClick={() => {
                   playClick();
                   setIsActive(!isActive);
                 }}
-                className={`px-4 py-2 text-xs font-semibold uppercase rounded-full ${isActive ? 'bg-yellow-600 text-slate-900' : 'bg-green-600 text-slate-900'}`}
+                className={`min-h-11 rounded-xl px-3 text-xs font-bold uppercase ${isActive ? 'bg-amber-400/15 text-amber-200' : 'bg-emerald-400/15 text-emerald-200'}`}
               >
-                {isActive ? 'Pause Timer' : 'Start Timer'}
+                {isActive ? 'Pause' : 'Start'}
               </button>
             )}
-          </div>
-          <div className="relative mb-3">
-            <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-              <div
-                className={`h-full bg-yellow-500 transition-all duration-500 ease-out ${levelPulse ? 'animate-pulse' : ''}`}
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
-            <p className="text-[10px] text-slate-500 mt-1 text-center">~{Math.round(sessionCalories)} kcal</p>
           </div>
           <button
             onClick={handleEndSession}
             disabled={isSaving}
-            className="w-full py-4 bg-gradient-to-r from-emerald-500 via-lime-400 to-blue-500 text-slate-900 font-bold text-lg uppercase rounded-2xl shadow-lg shadow-emerald-500/40 disabled:opacity-60"
+            className="neon-button w-full rounded-xl px-4 py-3.5 text-base font-extrabold disabled:opacity-60"
           >
-            {isSaving ? 'Saving...' : 'End Session & Save'}
+            {isSaving ? 'Saving session…' : 'Finish & save session'}
           </button>
         </div>
       </div>
       {unlockedBadges.length > 0 && (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-slate-800 border border-emerald-500 rounded-lg px-4 py-2 text-xs text-emerald-100 shadow-lg shadow-emerald-900/40">
+        <div className="fixed bottom-56 left-1/2 z-40 -translate-x-1/2 rounded-xl border border-emerald-400/30 bg-slate-900 px-4 py-3 text-sm text-emerald-100 shadow-lg shadow-emerald-900/40">
           <div className="flex items-center gap-2">
             <span className="text-emerald-300">New Badge</span>
             <span className="font-semibold">{badgeLabels[unlockedBadges[0]] || unlockedBadges[0]}</span>
           </div>
         </div>
       )}
-      <BottomNav />
-    </div>
+    </main>
   );
 };
 

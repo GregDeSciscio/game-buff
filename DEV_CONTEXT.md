@@ -39,6 +39,7 @@
 - **friends:** `id`, `requester_id`, `addressee_id`, `status` (pending/accepted/blocked), `created_at`
 
 ## 5. Changelog
+- **[Latest] Cohesive Mobile Redesign:** Unified the authenticated visual system, introduced four-item navigation, prioritized remembered quick-start loadouts, added a three-step loadout builder, and converted live sessions into a focused mode with undo and an exit confirmation sheet.
 - **[Latest] Streaks/Badges:** Added tables + RLS; finish_session updates streaks and awards session/streak badges; dashboard widget reads them; seed includes sample streaks/badges.
 - **Animated Exercise Previews:** Session triggers and loadout builder show animated cues with a toggle; centralized calories helper retained.
 - **Animated Loadout Builder:** Create/Edit loadouts now show animated cues per exercise with a toggle.

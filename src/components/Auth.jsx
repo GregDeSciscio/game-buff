@@ -1,79 +1,12 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
-import { Gamepad2, Loader2, ArrowRight } from 'lucide-react';
+import { Gamepad2, Loader2, ArrowRight, Zap, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Auth = () => {
-  const [loading, setLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
-  const navigate = useNavigate();
-
-  const handleAuth = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setErrorMsg('');
-
-    try {
-      if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
-          email: email,
-          password: password,
-          options: { data: { full_name: email.split('@')[0] } }
-        });
-        if (error) throw error;
-        alert("Account created! Check your email to confirm.");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email: email,
-          password: password,
-        });
-        if (error) throw error;
-        navigate('/dashboard');
-      }
-    } catch (error) {
-      setErrorMsg(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-slate-900 flex flex-col justify-center items-center p-6 font-sans">
-      <div className="mb-8 text-center animate-fade-in-down">
-        <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/20 rotate-3">
-          <Gamepad2 size={40} className="text-white" />
-        </div>
-        <h1 className="text-3xl font-black text-white tracking-tighter">GAME BUFF</h1>
-        <p className="text-slate-400 mt-2">Level up in real life.</p>
-      </div>
-
-      <div className="w-full max-w-sm bg-slate-800 border border-slate-700 p-8 rounded-2xl shadow-xl">
-        <form onSubmit={handleAuth} className="space-y-6">
-          <div>
-            <label className="block text-xs uppercase tracking-wider text-slate-500 mb-2">Email</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full bg-slate-900 border border-slate-600 text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="player@one.com" />
-          </div>
-          <div>
-            <label className="block text-xs uppercase tracking-wider text-slate-500 mb-2">Password</label>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className="w-full bg-slate-900 border border-slate-600 text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="••••••••" />
-          </div>
-          {errorMsg && <div className="text-red-400 text-sm bg-red-900/20 p-3 rounded border border-red-900/50">{errorMsg}</div>}
-          <button type="submit" disabled={loading} className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50">
-            {loading ? <Loader2 className="animate-spin" /> : <>{isSignUp ? 'Create Account' : 'Login'} <ArrowRight size={18} /></>}
-          </button>
-        </form>
-        <div className="mt-6 text-center">
-          <p className="text-slate-400 text-sm">
-            {isSignUp ? "Already have a save file?" : "New player?"}{" "}
-            <button onClick={() => setIsSignUp(!isSignUp)} className="text-blue-400 font-bold hover:underline">{isSignUp ? "Login" : "Sign Up"}</button>
-          </p>
-        </div>
-      </div>
-    </div>
-  );
+  const [loading, setLoading] = useState(false); const [isSignUp, setIsSignUp] = useState(false);
+  const [email, setEmail] = useState(''); const [password, setPassword] = useState(''); const [errorMsg, setErrorMsg] = useState(''); const navigate = useNavigate();
+  const handleAuth = async (e) => { e.preventDefault(); setLoading(true); setErrorMsg(''); try { if (isSignUp) { const { error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: email.split('@')[0] } } }); if (error) throw error; alert('Account created! Check your email to confirm.'); } else { const { error } = await supabase.auth.signInWithPassword({ email, password }); if (error) throw error; navigate('/dashboard'); } } catch (error) { setErrorMsg(error.message); } finally { setLoading(false); } };
+  return <main className="page-shell grid min-h-screen place-items-center overflow-hidden p-5"><div className="orbit -left-36 -bottom-36" /><div className="relative grid w-full max-w-5xl overflow-hidden rounded-[2rem] border border-white/10 bg-[#0f1729]/75 shadow-2xl shadow-black/40 backdrop-blur-xl md:grid-cols-[1.05fr_.95fr]"><section className="relative hidden min-h-[590px] overflow-hidden bg-gradient-to-br from-violet-700 via-indigo-700 to-[#111d45] p-10 md:block"><div className="absolute -right-24 top-10 h-72 w-72 rounded-full border border-white/20" /><div className="absolute -right-9 top-24 h-48 w-48 rounded-full border border-white/20" /><div className="relative flex h-full flex-col justify-between"><div className="flex items-center gap-2 text-sm font-bold tracking-wide"><Zap size={18} fill="currentColor" /> GAME BUFF</div><div><p className="eyebrow !text-violet-200">TRAIN LIKE IT’S A QUEST</p><h1 className="mt-3 max-w-md text-5xl font-black leading-[.95] tracking-tight text-white">Make every match count.</h1><p className="mt-5 max-w-sm text-base leading-6 text-violet-100/75">Turn your favorite games into a personalized workout and stack real-world XP.</p></div><div className="flex items-center gap-3 text-sm text-violet-100"><ShieldCheck size={18} /><span>Progress that plays with you.</span></div></div></section><section className="p-7 sm:p-10"><div className="mb-9 md:hidden"><div className="mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-violet-400 to-indigo-600"><Gamepad2 /></div><p className="eyebrow">Game Buff</p><h1 className="mt-1 text-3xl font-black text-white">Level up for real.</h1></div><div className="mb-7"><p className="eyebrow">{isSignUp ? 'New player' : 'Welcome back'}</p><h2 className="mt-1 text-3xl font-extrabold tracking-tight text-white">{isSignUp ? 'Build your save file' : 'Enter the arena'}</h2><p className="mt-2 text-sm text-slate-400">{isSignUp ? 'Your first quest starts here.' : 'Your next level is waiting.'}</p></div><form onSubmit={handleAuth} className="space-y-5"><label className="block"><span className="eyebrow mb-2 block">Email</span><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="player@one.com" className="w-full rounded-xl border border-slate-700 bg-slate-950/60 px-4 py-3 text-white outline-none transition focus:ring-2 focus:ring-violet-400/50" /></label><label className="block"><span className="eyebrow mb-2 block">Password</span><input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} placeholder="••••••••" className="w-full rounded-xl border border-slate-700 bg-slate-950/60 px-4 py-3 text-white outline-none transition focus:ring-2 focus:ring-violet-400/50" /></label>{errorMsg && <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">{errorMsg}</div>}<button type="submit" disabled={loading} className="neon-button w-full rounded-xl py-3.5 font-bold disabled:opacity-50">{loading ? <Loader2 className="animate-spin" /> : <>{isSignUp ? 'Create account' : 'Log in'} <ArrowRight size={18} /></>}</button></form><p className="mt-6 text-center text-sm text-slate-400">{isSignUp ? 'Already have a save file?' : 'New to Game Buff?'} <button onClick={() => setIsSignUp(!isSignUp)} className="font-bold text-violet-300 hover:text-white">{isSignUp ? 'Log in' : 'Create one'}</button></p></section></div></main>;
 };
-
 export default Auth;
